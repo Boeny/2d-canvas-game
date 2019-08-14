@@ -1,45 +1,8 @@
 import React from "react";
-import { Stage, Layer, Rect } from "react-konva";
+import { Stage, Layer } from "react-konva";
 import Konva from "konva";
 import { activeStore } from "stores/ActiveStore";
-
-interface IProps {
-    x: number;
-    y: number;
-}
-
-interface IState {
-    color: string;
-}
-
-class ColoredRect extends React.PureComponent<IProps, IState> {
-
-    public state: IState = { color: "green" };
-
-    public onKeyDown = () => console.log("circle is moving");
-    public onKeyUp = () => console.log("circle stopped moving");
-    public onKeyPress = () => console.log("circle has moved");
-
-    private onClick = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        e.evt.preventDefault();
-        activeStore.setActive(this);
-        this.setState({ color: Konva.Util.getRandomColor() });
-    }
-
-    render() {
-
-        return (
-            <Rect
-                {...this.props}
-                width={50}
-                height={50}
-                fill={this.state.color}
-                shadowBlur={1}
-                onClick={this.onClick}
-            />
-        );
-    }
-}
+import { Ground, Rect } from "components";
 
 export class App extends React.PureComponent {
 
@@ -70,16 +33,25 @@ export class App extends React.PureComponent {
         // Stage is a div container
         // Layer is actual canvas element (so you may have several canvases in the stage)
         // And then we have canvas shapes inside the Layer
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
         return (
             <Stage
-                width={window.innerWidth}
-                height={window.innerHeight}
+                width={width}
+                height={height}
                 ref={el => this.stage = el ? el.getStage() : null}
                 tabIndex={1}
             >
                 <Layer>
-                    <Ground onClick={() => activeStore.setActive(null)} />
-                    <ColoredRect x={window.innerWidth / 2} y={window.innerHeight / 2} />
+                    <Ground
+                        x={0}
+                        y={0}
+                        width={width}
+                        height={height}
+                        onClick={() => activeStore.setActive(null)}
+                    />
+                    <Rect x={width / 2} y={height / 2} />
                 </Layer>
             </Stage>
         );

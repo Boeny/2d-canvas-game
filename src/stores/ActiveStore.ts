@@ -1,18 +1,13 @@
 import { observable, action } from "mobx";
-
-interface IActiveElement {
-    onKeyDown(e: KeyboardEvent): void;
-    onKeyUp(e: KeyboardEvent): void;
-    onKeyPress(e: KeyboardEvent): void;
-}
+import { IActiveComponent } from "models/ActiveComponent";
 
 class ActiveStore {
 
     @observable
-    public activeElement: IActiveElement | null = null;
+    public activeElement: IActiveComponent | null = null;
 
     @action
-    setActive(activeElement: IActiveElement | null) {
+    setActive(activeElement: IActiveComponent | null) {
         console.log(activeElement);
         this.activeElement = activeElement;
     }
