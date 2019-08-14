@@ -1,6 +1,3 @@
-// Style configuration
-import "./global.scss";
-
 import { configure as mobXConfig } from "mobx";
 import "reflect-metadata";
 import { useStrictMode } from "react-konva";
