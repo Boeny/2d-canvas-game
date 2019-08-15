@@ -12,6 +12,7 @@ interface IProps {
 
 interface IState {
     position: Vector2;
+    moveDirection: Vector2;
 }
 
 export class Rect extends ActiveComponent<IProps, IState> {
@@ -28,21 +29,19 @@ export class Rect extends ActiveComponent<IProps, IState> {
         this.setActive();
     }
 
+    startMoving(moveDirection: Vector2) {
+        this.setState({ moveDirection });
+    }
+
     public onKeyDown = (e: KeyboardEvent) => {
 
-        let additionalVelocity;
-
         switch (e.keyCode) {
-            case KeysType.up: additionalVelocity = Vector2.up; break;
-            case KeysType.down: additionalVelocity = Vector2.down; break;
-            case KeysType.left: additionalVelocity = Vector2.left; break;
-            case KeysType.right: additionalVelocity = Vector2.right; break;
+            case KeysType.up: this.startMoving(Vector2.up); break;
+            case KeysType.down: this.startMoving(Vector2.down); break;
+            case KeysType.left: this.startMoving(Vector2.left); break;
+            case KeysType.right: this.startMoving(Vector2.right); break;
         }
-        if (isNullOrUndefined(additionalVelocity)) {
-            return;
-        }
-        this.velocity = this.velocity.add(additionalVelocity.multScalar(this.ACCELERATION));
-        requestAnimationFrame(this.move);
+        this.velocity.selfAdd(additionalVelocity.multScalar(this.ACCELERATION));
     }
 
     move = () => {

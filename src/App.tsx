@@ -15,6 +15,11 @@ export class App extends React.PureComponent {
         const container = this.stage.container();
         container.focus();
 
+	container.addEventListener("click", e => {
+            e.preventDefault();
+	    activeStore.activeElement && activeStore.activeElement.onContainerClick(e);
+	});
+
         container.addEventListener("keydown", e => {
             e.preventDefault();
             activeStore.activeElement && activeStore.activeElement.onKeyDown(e);
