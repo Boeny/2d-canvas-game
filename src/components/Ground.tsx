@@ -6,7 +6,7 @@ interface IProps {
     y: number;
     width: number;
     height: number;
-    onClick: () => void;
+    onClick?: () => void;
 }
 
 export class Ground extends React.PureComponent<IProps> {

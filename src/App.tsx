@@ -49,7 +49,6 @@ export class App extends React.PureComponent {
                         y={0}
                         width={width}
                         height={height}
-                        onClick={() => activeStore.setActive(null)}
                     />
                     <Rect x={width / 2} y={height / 2} />
                 </Layer>
