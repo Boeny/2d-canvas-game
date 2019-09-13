@@ -1,2 +1,2 @@
-export * from "./Rect";
+export * from "./Cells";
 export * from "./Ground";

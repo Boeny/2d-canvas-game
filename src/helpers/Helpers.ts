@@ -57,4 +57,23 @@ export abstract class Helpers {
             setTimeout(() => resolve(callback()), 0);
         });
     }
+
+    public static random(min: number, max?: number): number {
+
+        if (isNullOrUndefined(max) || min > max) {
+            return Math.random() * min;
+        }
+        return Math.random() * (max - min) + min;
+    }
+
+    public static clamp(n: number, min: number, max: number): number {
+
+        if (n < min) {
+            return min;
+        }
+        if (n > max) {
+            return max;
+        }
+        return n;
+    }
 }

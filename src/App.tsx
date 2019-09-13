@@ -1,8 +1,7 @@
 import React from "react";
 import { Stage, Layer } from "react-konva";
 import Konva from "konva";
-import { activeStore } from "stores/ActiveStore";
-import { Ground, Rect } from "components";
+import { Ground, Cells } from "components";
 
 export class App extends React.PureComponent {
 
@@ -14,24 +13,6 @@ export class App extends React.PureComponent {
         }
         const container = this.stage.container();
         container.focus();
-
-	container.addEventListener("click", e => {
-            e.preventDefault();
-	    activeStore.activeElement && activeStore.activeElement.onContainerClick(e);
-	});
-
-        container.addEventListener("keydown", e => {
-            e.preventDefault();
-            activeStore.activeElement && activeStore.activeElement.onKeyDown(e);
-        });
-        container.addEventListener("keyup", e => {
-            e.preventDefault();
-            activeStore.activeElement && activeStore.activeElement.onKeyUp(e);
-        });
-        container.addEventListener("keypress", e => {
-            e.preventDefault();
-            activeStore.activeElement && activeStore.activeElement.onKeyPress(e);
-        });
     }
 
     render() {
@@ -55,7 +36,7 @@ export class App extends React.PureComponent {
                         width={width}
                         height={height}
                     />
-                    <Rect x={width / 2} y={height / 2} />
+                    <Cells x={25} y={height / 2} />
                 </Layer>
             </Stage>
         );
