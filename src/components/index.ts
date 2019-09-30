@@ -1,2 +1,2 @@
-export * from "./Rect";
+export * from "./Player";
 export * from "./Ground";

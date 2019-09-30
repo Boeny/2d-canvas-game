@@ -10,9 +10,9 @@ export interface IActiveComponent {
 
 export class ActiveComponent<P, S> extends React.PureComponent<P, S> implements IActiveComponent {
 
-    public onKeyDown = () => {};
-    public onKeyUp = () => {};
-    public onKeyPress = () => {};
+    public onKeyDown = (e: KeyboardEvent) => {};
+    public onKeyUp = (e: KeyboardEvent) => {};
+    public onKeyPress = (e: KeyboardEvent) => {};
     public onContainerClick = () => {};
 
     setActive = () => {

@@ -2,7 +2,7 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import Konva from "konva";
 import { activeStore } from "stores/ActiveStore";
-import { Ground, Rect } from "components";
+import { Ground, Player } from "components";
 
 export class App extends React.PureComponent {
 
@@ -55,7 +55,7 @@ export class App extends React.PureComponent {
                         width={width}
                         height={height}
                     />
-                    <Rect x={width / 2} y={height / 2} />
+                    <Player x={width / 2} y={height / 2} />
                 </Layer>
             </Stage>
         );

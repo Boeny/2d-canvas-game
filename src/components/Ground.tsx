@@ -12,7 +12,6 @@ interface IProps {
 export class Ground extends React.PureComponent<IProps> {
 
     render() {
-
         return (
             <KRect
                 {...this.props}
