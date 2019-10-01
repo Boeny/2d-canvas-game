@@ -1,5 +1,4 @@
 import { configure as mobXConfig } from "mobx";
-import "reflect-metadata";
 import { useStrictMode } from "react-konva";
 
 import React from "react";

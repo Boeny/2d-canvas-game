@@ -55,7 +55,7 @@ export class App extends React.PureComponent {
                         width={width}
                         height={height}
                     />
-                    <Player x={width / 2} y={height / 2} />
+                    <Player areaWidth={width} areaHeight={height} />
                 </Layer>
             </Stage>
         );
