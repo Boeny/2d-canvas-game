@@ -20,12 +20,13 @@ interface IState {
 
 export class Player extends ActiveComponent<IProps, IState> {
 
-    SPEED = 5;
-    ROTATION_SPEED = 0.1;
-    SCALE = 20;
-    deviationAngle = 3 * Math.PI / 4;
+    private ACCELERATION = 0.1;
+    private MAX_ROTATION_SPEED = 0.1;
+    private SCALE = 20;
+    private WING_DEVIATION_ANGLE = 3 * Math.PI / 4;
+    private FRICTION = 0.02;
 
-    private speed = 0;
+    private velocity = new Vector2();
 
     constructor(props: IProps) {
         super(props);
@@ -62,7 +63,7 @@ export class Player extends ActiveComponent<IProps, IState> {
         this.setState({ up, down, left, right });
     }
 
-    timeout: NodeJS.Timeout | null = null;
+    private timeout: NodeJS.Timeout | null = null;
     componentDidUpdate() {
         if (this.timeout) {
             return;
@@ -72,48 +73,52 @@ export class Player extends ActiveComponent<IProps, IState> {
                 this.timeout = null;
                 requestAnimationFrame(this.move);
             },
-            10
+            5
         );
     }
 
-    move = () => {
+    private move = () => {
         const { up, down, left, right, direction } = this.state;
-        this.speed = 0;
 
-        if (up) {
-            this.speed = this.SPEED;
-        }
-        else
-        if (down) {
-            this.speed = -this.SPEED;
-        }
         if (left) {
-            direction.selfRotateNormalized(this.ROTATION_SPEED);
+            direction.rotateNormalized(this.MAX_ROTATION_SPEED);
         }
         else
         if (right) {
-            direction.selfRotateNormalized(-this.ROTATION_SPEED);
+            direction.rotateNormalized(-this.MAX_ROTATION_SPEED);
         }
-        if (up || down || left || right) {
+
+        if (up) {
+            this.velocity.add(direction.clone().multScalar(this.ACCELERATION));
+        }
+        else
+        if (down) {
+            this.velocity.add(direction.clone().multScalar(-this.ACCELERATION));
+        }
+
+        if (up || down || left || right || this.velocity.length > 0) {
+            this.velocity.sub(this.velocity.clone().normalize().multScalar(this.FRICTION));
             this.setState({
-                position: this.state.position.add(direction.multScalar(this.speed)),
+                position: this.state.position.clone().add(this.velocity),
                 direction
             });
         }
     }
 
-    get leftSide(): Vector2 {
-        return this.state.position.add(this.state.direction.rotateNormalized(this.deviationAngle)
-            .multScalar(this.SCALE));
+    private get leftSide(): Vector2 {
+        return this.state.position.clone().add(
+            this.state.direction.clone().rotateNormalized(this.WING_DEVIATION_ANGLE).multScalar(this.SCALE)
+        );
     }
 
-    get rightSide(): Vector2 {
-        return this.state.position.add(this.state.direction.rotateNormalized(-this.deviationAngle)
-            .multScalar(this.SCALE));
+    private get rightSide(): Vector2 {
+        return this.state.position.clone().add(
+            this.state.direction.clone().rotateNormalized(-this.WING_DEVIATION_ANGLE).multScalar(this.SCALE)
+        );
     }
 
-    get frontSide(): Vector2 {
-        return this.state.position.add(this.state.direction.multScalar(this.SCALE));
+    private get frontSide(): Vector2 {
+        return this.state.position.clone().add(this.state.direction.clone().multScalar(this.SCALE));
     }
 
     public render() {
