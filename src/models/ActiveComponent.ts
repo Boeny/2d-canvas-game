@@ -1,5 +1,6 @@
-import React from "react";
 import { activeStore } from "stores/ActiveStore";
+import { GameObjectComponent } from "./GameObjectComponent";
+import { IGameObjectComponent } from "stores/GameLoopStore";
 
 export interface IActiveComponent {
     onKeyDown: (e: KeyboardEvent) => void;
@@ -8,14 +9,15 @@ export interface IActiveComponent {
     onContainerClick: (e: MouseEvent) => void;
 }
 
-export class ActiveComponent<P, S> extends React.PureComponent<P, S> implements IActiveComponent {
+export class ActiveComponent<P> extends GameObjectComponent<P> implements IActiveComponent, IGameObjectComponent {
 
     public onKeyDown = (e: KeyboardEvent) => {};
     public onKeyUp = (e: KeyboardEvent) => {};
     public onKeyPress = (e: KeyboardEvent) => {};
     public onContainerClick = (e: MouseEvent) => {};
 
-    setActive = () => {
+    componentDidMount() {
+        super.componentDidMount();
         activeStore.setActive(this);
     }
 }

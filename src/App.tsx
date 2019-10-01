@@ -1,12 +1,21 @@
 import React from "react";
 import { Stage, Layer } from "react-konva";
 import Konva from "konva";
+import { observer } from "mobx-react";
 import { activeStore } from "stores/ActiveStore";
+import { bulletStore } from "stores/BulletStore";
 import { Ground, Player, Bullets } from "components";
+import { containerStore } from "stores/ContainerStore";
+import { gameLoopStore } from "stores/GameLoopStore";
 
+@observer
 export class App extends React.PureComponent {
 
     stage: Konva.Stage | null = null;
+
+    reSize = () => {
+        containerStore.setSize(window.innerWidth, window.innerHeight);
+    }
 
     componentDidMount() {
         if (!this.stage) {
@@ -31,31 +40,27 @@ export class App extends React.PureComponent {
             e.preventDefault();
             activeStore.activeElement && activeStore.activeElement.onKeyPress(e);
         });
+        document.onresize = this.reSize;
+
+        this.reSize();
+        gameLoopStore.run();
     }
 
     render() {
         // Stage is a div container
         // Layer is actual canvas element (so you may have several canvases in the stage)
         // And then we have canvas shapes inside the Layer
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-
         return (
             <Stage
-                width={width}
-                height={height}
+                width={containerStore.width}
+                height={containerStore.height}
                 ref={el => this.stage = el ? el.getStage() : null}
                 tabIndex={1}
             >
                 <Layer>
-                    <Ground
-                        x={0}
-                        y={0}
-                        width={width}
-                        height={height}
-                    />
-                    <Player areaWidth={width} areaHeight={height} />
-                    <Bullets areaWidth={width} areaHeight={height} />
+                    <Ground />
+                    <Player createBullet={(...args) => bulletStore.createBullet(...args)} />
+                    <Bullets />
                 </Layer>
             </Stage>
         );

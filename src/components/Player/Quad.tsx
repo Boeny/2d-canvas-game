@@ -1,5 +1,7 @@
 import React from "react";
+import { observer } from "mobx-react";
 import { Vector2 } from "helpers";
+import { containerStore } from "stores/ContainerStore";
 import { MovableObject } from "../MovableObject";
 
 interface IProps {
@@ -7,17 +9,16 @@ interface IProps {
     color: string;
     center: Vector2;
     direction: Vector2;
-    areaWidth: number;
-    areaHeight: number;
 }
 
+@observer
 export class Quad extends React.PureComponent<IProps> {
 
     private get points(): Vector2[] {
 
-        const { areaWidth, areaHeight, center } = this.props;
-        const halfWidth = areaWidth / 2;
-        const halfHeight = areaHeight / 2;
+        const { center } = this.props;
+        const halfWidth = containerStore.halfWidth;
+        const halfHeight = containerStore.halfHeight;
 
         return [
             new Vector2(center.x - halfWidth, center.y - halfHeight),
@@ -29,7 +30,7 @@ export class Quad extends React.PureComponent<IProps> {
 
     render() {
 
-        const { direction, areaWidth, areaHeight, color } = this.props;
+        const { direction, color } = this.props;
 
         return (
             <>
@@ -38,8 +39,6 @@ export class Quad extends React.PureComponent<IProps> {
                         key={i}
                         position={point}
                         direction={direction}
-                        areaWidth={areaWidth}
-                        areaHeight={areaHeight}
                         color={color}
                         scale={this.props.scale}
                     />

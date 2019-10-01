@@ -3,12 +3,11 @@ import { ActiveComponent } from "models/ActiveComponent";
 import { KeysType } from "enums/KeysType";
 import { Vector2 } from "helpers";
 import { Quad } from "./Quad";
-import { bulletStore } from "../Bullets";
 import { VectorHelpers } from "helpers/VectorHelpers";
+import { containerStore } from "stores/ContainerStore";
 
 interface IProps {
-    areaWidth: number;
-    areaHeight: number;
+    createBullet: (position: Vector2, direction: Vector2, initialVelocity: Vector2) => void;
 }
 
 interface IState {
@@ -20,7 +19,7 @@ interface IState {
     right: boolean;
 }
 
-export class Player extends ActiveComponent<IProps, IState> {
+export class Player extends ActiveComponent<IProps> {
 
     private SCALE = 20;
     private ACCELERATION = 0.1;
@@ -29,35 +28,34 @@ export class Player extends ActiveComponent<IProps, IState> {
 
     private velocity = new Vector2();
     private currentItemPosition = new Vector2();
+    private gameState: IState = {
+        position: new Vector2(),
+        direction: Vector2.up,
+        up: false,
+        down: false,
+        left: false,
+        right: false
+    };
 
-    constructor(props: IProps) {
-        super(props);
-        this.state = {
-            position: new Vector2(),
-            direction: Vector2.up,
-            up: false,
-            down: false,
-            left: false,
-            right: false
-        };
-        this.setActive();
+    private setGameState(data: Partial<IState>) {
+        this.gameState = { ...this.gameState, ...data };
     }
 
     public onKeyDown = (e: KeyboardEvent) => {
-        let { up, down, left, right } = this.state;
+        let { up, down, left, right } = this.gameState;
 
         switch (e.keyCode) {
             case KeysType.up: up = true; down = false; break;
             case KeysType.down: down = true; up = false; break;
             case KeysType.left: left = true; right = false; break;
             case KeysType.right: right = true; left = false; break;
-            case KeysType.space: bulletStore.createBullet(this.currentItemPosition, this.state.direction, this.velocity); break;
+            case KeysType.space: this.props.createBullet(this.currentItemPosition, this.gameState.direction, this.velocity); break;
         }
-        this.setState({ up, down, left, right });
+        this.setGameState({ up, down, left, right });
     }
 
     public onKeyUp = (e: KeyboardEvent) => {
-        let { up, down, left, right } = this.state;
+        let { up, down, left, right } = this.gameState;
 
         switch (e.keyCode) {
             case KeysType.up: up = false; break;
@@ -65,25 +63,11 @@ export class Player extends ActiveComponent<IProps, IState> {
             case KeysType.left: left = false; break;
             case KeysType.right: right = false; break;
         }
-        this.setState({ up, down, left, right });
+        this.setGameState({ up, down, left, right });
     }
 
-    private timeout: NodeJS.Timeout | null = null;
-    componentDidUpdate() {
-        if (this.timeout) {
-            return;
-        }
-        this.timeout = setTimeout(
-            () => {
-                this.timeout = null;
-                requestAnimationFrame(this.move);
-            },
-            5
-        );
-    }
-
-    private move = () => {
-        const { up, down, left, right, direction } = this.state;
+    public onGameLoop = () => {
+        const { up, down, left, right, direction } = this.gameState;
 
         if (left) {
             direction.rotateNormalized(this.MAX_ROTATION_SPEED);
@@ -103,41 +87,20 @@ export class Player extends ActiveComponent<IProps, IState> {
 
         if (up || down || left || right || this.velocity.length > 0) {
             this.velocity.sub(this.velocity.clone().normalize().multScalar(this.FRICTION));
-            const position = this.applyInfiniteMovement(this.state.position.clone().add(this.velocity));
+            const position = containerStore.applyInfiniteMovement(this.gameState.position.clone().add(this.velocity));
             this.setCurrentItemPosition(position);
-            this.setState({ position, direction });
+            this.setGameState({ position, direction });
         }
     }
 
     setCurrentItemPosition(position: Vector2) {
-        const { areaWidth, areaHeight } = this.props;
-        const halfWidth = areaWidth / 2;
-        const halfHeight = areaHeight / 2;
-        const frontPoint = VectorHelpers.getTriangleFrontPoint(position, this.state.direction, this.SCALE);
+
+        const halfWidth = containerStore.halfWidth;
+        const halfHeight = containerStore.halfHeight;
+        const frontPoint = VectorHelpers.getTriangleFrontPoint(position, this.gameState.direction, this.SCALE);
 
         this.currentItemPosition.x = frontPoint.x + (frontPoint.x < halfWidth ? halfWidth : -halfWidth);
         this.currentItemPosition.y = frontPoint.y + (frontPoint.y < halfHeight ? halfHeight : -halfHeight);
-    }
-
-    applyInfiniteMovement(position: Vector2): Vector2 {
-        const { areaWidth, areaHeight } = this.props;
-
-        if (position.x < 0) {
-            position.x += areaWidth;
-        }
-        else
-        if (position.x > areaWidth) {
-            position.x -= areaWidth;
-        }
-
-        if (position.y < 0) {
-            position.y += areaHeight;
-        }
-        else
-        if (position.y > areaHeight) {
-            position.y -= areaHeight;
-        }
-        return position;
     }
 
     public render() {
@@ -145,9 +108,8 @@ export class Player extends ActiveComponent<IProps, IState> {
             <Quad
                 scale={this.SCALE}
                 color="green"
-                center={this.state.position}
-                direction={this.state.direction}
-                {...this.props}
+                center={this.gameState.position}
+                direction={this.gameState.direction}
             />
         );
     }
