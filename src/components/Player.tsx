@@ -164,10 +164,31 @@ export class Player extends ActiveComponent<IProps, IState> {
         if (up || down || left || right || this.velocity.length > 0) {
             this.velocity.sub(this.velocity.clone().normalize().multScalar(this.FRICTION));
             this.setState({
-                position: this.state.position.clone().add(this.velocity),
+                position: this.applyInfiniteMovement(this.state.position.clone().add(this.velocity)),
                 direction
             });
         }
+    }
+
+    applyInfiniteMovement(position: Vector2): Vector2 {
+        const { areaWidth, areaHeight } = this.props;
+
+        if (position.x < 0) {
+            position.x += areaWidth;
+        }
+        else
+        if (position.x > areaWidth) {
+            position.x -= areaWidth;
+        }
+
+        if (position.y < 0) {
+            position.y += areaHeight;
+        }
+        else
+        if (position.y > areaHeight) {
+            position.y -= areaHeight;
+        }
+        return position;
     }
 
     public render() {
