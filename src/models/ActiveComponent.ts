@@ -13,7 +13,7 @@ export class ActiveComponent<P, S> extends React.PureComponent<P, S> implements 
     public onKeyDown = (e: KeyboardEvent) => {};
     public onKeyUp = (e: KeyboardEvent) => {};
     public onKeyPress = (e: KeyboardEvent) => {};
-    public onContainerClick = () => {};
+    public onContainerClick = (e: MouseEvent) => {};
 
     setActive = () => {
         activeStore.setActive(this);

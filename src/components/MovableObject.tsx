@@ -1,9 +1,10 @@
 import React from "react";
 import { Vector2 } from "helpers";
-import { Triangle } from "../Triangle";
+import { Triangle } from "./Triangle";
+import { VectorHelpers } from "helpers/VectorHelpers";
 
 interface IProps {
-    center: Vector2;
+    position: Vector2;
     direction: Vector2;
     areaWidth: number;
     areaHeight: number;
@@ -29,25 +30,25 @@ export class MovableObject extends React.PureComponent<IProps> {
     }
 
     private frontPoint(position: Vector2, direction: Vector2): Vector2 {
-        return position.clone().add(direction.clone().multScalar(this.SCALE));
+        return VectorHelpers.getTriangleFrontPoint(position, direction, this.SCALE);
     }
 
-    private isPointOnScreen(point: Vector2) {
+    private isInArea(point: Vector2): boolean {
         return point.x > -this.SCALE && point.x < this.props.areaWidth + this.SCALE &&
             point.y > -this.SCALE && point.y < this.props.areaHeight + this.SCALE;
     }
 
     render() {
 
-        const { direction, center, color } = this.props;
-        if (!this.isPointOnScreen(center)) {
+        const { direction, position, color } = this.props;
+        if (!this.isInArea(position)) {
             return null;
         }
         return (
             <Triangle
-                a={this.leftPoint(center, direction)}
-                b={this.rightPoint(center, direction)}
-                c={this.frontPoint(center, direction)}
+                a={this.leftPoint(position, direction)}
+                b={this.rightPoint(position, direction)}
+                c={this.frontPoint(position, direction)}
                 color={color}
             />
         );

@@ -1,9 +1,10 @@
 import React from "react";
 import { Vector2 } from "helpers";
-import { MovableObject } from "./MovableObject";
-import { Bullets } from "./Bullets";
+import { MovableObject } from "../MovableObject";
 
 interface IProps {
+    scale: number;
+    color: string;
     center: Vector2;
     direction: Vector2;
     areaWidth: number;
@@ -28,27 +29,20 @@ export class Quad extends React.PureComponent<IProps> {
 
     render() {
 
-        const { direction, areaWidth, areaHeight } = this.props;
+        const { direction, areaWidth, areaHeight, color } = this.props;
 
         return (
             <>
                 {this.points.map((point, i) =>
-                    <React.Fragment key={i}>
-                        <MovableObject
-                            center={point}
-                            direction={direction}
-                            areaWidth={areaWidth}
-                            areaHeight={areaHeight}
-                            color="green"
-                            scale={20}
-                        />
-                        <Bullets
-                            center={point}
-                            direction={direction}
-                            areaWidth={areaWidth}
-                            areaHeight={areaHeight}
-                        />
-                    </React.Fragment>
+                    <MovableObject
+                        key={i}
+                        position={point}
+                        direction={direction}
+                        areaWidth={areaWidth}
+                        areaHeight={areaHeight}
+                        color={color}
+                        scale={this.props.scale}
+                    />
                 )}
             </>
         );

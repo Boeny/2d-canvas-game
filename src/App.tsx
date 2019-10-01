@@ -2,7 +2,7 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import Konva from "konva";
 import { activeStore } from "stores/ActiveStore";
-import { Ground, Player } from "components";
+import { Ground, Player, Bullets } from "components";
 
 export class App extends React.PureComponent {
 
@@ -19,7 +19,6 @@ export class App extends React.PureComponent {
             e.preventDefault();
             activeStore.activeElement && activeStore.activeElement.onContainerClick(e);
         });
-
         container.addEventListener("keydown", e => {
             e.preventDefault();
             activeStore.activeElement && activeStore.activeElement.onKeyDown(e);
@@ -56,6 +55,7 @@ export class App extends React.PureComponent {
                         height={height}
                     />
                     <Player areaWidth={width} areaHeight={height} />
+                    <Bullets areaWidth={width} areaHeight={height} />
                 </Layer>
             </Stage>
         );

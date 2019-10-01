@@ -3,6 +3,8 @@ import { ActiveComponent } from "models/ActiveComponent";
 import { KeysType } from "enums/KeysType";
 import { Vector2 } from "helpers";
 import { Quad } from "./Quad";
+import { bulletStore } from "../Bullets";
+import { VectorHelpers } from "helpers/VectorHelpers";
 
 interface IProps {
     areaWidth: number;
@@ -20,11 +22,13 @@ interface IState {
 
 export class Player extends ActiveComponent<IProps, IState> {
 
+    private SCALE = 20;
     private ACCELERATION = 0.1;
     private MAX_ROTATION_SPEED = 0.1;
     private FRICTION = 0.02;
 
     private velocity = new Vector2();
+    private currentItemPosition = new Vector2();
 
     constructor(props: IProps) {
         super(props);
@@ -41,17 +45,20 @@ export class Player extends ActiveComponent<IProps, IState> {
 
     public onKeyDown = (e: KeyboardEvent) => {
         let { up, down, left, right } = this.state;
+
         switch (e.keyCode) {
             case KeysType.up: up = true; down = false; break;
             case KeysType.down: down = true; up = false; break;
             case KeysType.left: left = true; right = false; break;
             case KeysType.right: right = true; left = false; break;
+            case KeysType.space: bulletStore.createBullet(this.currentItemPosition, this.state.direction, this.velocity); break;
         }
         this.setState({ up, down, left, right });
     }
 
     public onKeyUp = (e: KeyboardEvent) => {
         let { up, down, left, right } = this.state;
+
         switch (e.keyCode) {
             case KeysType.up: up = false; break;
             case KeysType.down: down = false; break;
@@ -96,11 +103,20 @@ export class Player extends ActiveComponent<IProps, IState> {
 
         if (up || down || left || right || this.velocity.length > 0) {
             this.velocity.sub(this.velocity.clone().normalize().multScalar(this.FRICTION));
-            this.setState({
-                position: this.applyInfiniteMovement(this.state.position.clone().add(this.velocity)),
-                direction
-            });
+            const position = this.applyInfiniteMovement(this.state.position.clone().add(this.velocity));
+            this.setCurrentItemPosition(position);
+            this.setState({ position, direction });
         }
+    }
+
+    setCurrentItemPosition(position: Vector2) {
+        const { areaWidth, areaHeight } = this.props;
+        const halfWidth = areaWidth / 2;
+        const halfHeight = areaHeight / 2;
+        const frontPoint = VectorHelpers.getTriangleFrontPoint(position, this.state.direction, this.SCALE);
+
+        this.currentItemPosition.x = frontPoint.x + (frontPoint.x < halfWidth ? halfWidth : -halfWidth);
+        this.currentItemPosition.y = frontPoint.y + (frontPoint.y < halfHeight ? halfHeight : -halfHeight);
     }
 
     applyInfiniteMovement(position: Vector2): Vector2 {
@@ -127,6 +143,8 @@ export class Player extends ActiveComponent<IProps, IState> {
     public render() {
         return (
             <Quad
+                scale={this.SCALE}
+                color="green"
                 center={this.state.position}
                 direction={this.state.direction}
                 {...this.props}
