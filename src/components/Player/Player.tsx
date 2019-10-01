@@ -2,74 +2,7 @@ import React from "react";
 import { ActiveComponent } from "models/ActiveComponent";
 import { KeysType } from "enums/KeysType";
 import { Vector2 } from "helpers";
-import { Triangle } from "./Triangle";
-
-interface IQuadProps extends IProps {
-    center: Vector2;
-    direction: Vector2;
-}
-
-class Quad extends React.PureComponent<IQuadProps> {
-
-    private SCALE = 20;
-    private WING_DEVIATION_ANGLE = 3 * Math.PI / 4;
-
-    private get points(): Vector2[] {
-
-        const { areaWidth, areaHeight, center } = this.props;
-        const halfWidth = areaWidth / 2;
-        const halfHeight = areaHeight / 2;
-
-        return [
-            new Vector2(center.x - halfWidth, center.y - halfHeight),
-            new Vector2(center.x + halfWidth, center.y - halfHeight),
-            new Vector2(center.x - halfWidth, center.y + halfHeight),
-            new Vector2(center.x + halfWidth, center.y + halfHeight)
-        ];
-    }
-
-    private leftPoint(position: Vector2, direction: Vector2): Vector2 {
-        return position.clone().add(
-            direction.clone().rotateNormalized(this.WING_DEVIATION_ANGLE).multScalar(this.SCALE)
-        );
-    }
-
-    private rightPoint(position: Vector2, direction: Vector2): Vector2 {
-        return position.clone().add(
-            direction.clone().rotateNormalized(-this.WING_DEVIATION_ANGLE).multScalar(this.SCALE)
-        );
-    }
-
-    private frontPoint(position: Vector2, direction: Vector2): Vector2 {
-        return position.clone().add(direction.clone().multScalar(this.SCALE));
-    }
-
-    private isPointOnScreen(point: Vector2) {
-        return point.x > -this.SCALE && point.x < this.props.areaWidth + this.SCALE &&
-            point.y > -this.SCALE && point.y < this.props.areaHeight + this.SCALE;
-    }
-
-    render() {
-
-        const { direction } = this.props;
-
-        return (
-            <>
-                {this.points.map((point, i) =>
-                    this.isPointOnScreen(point) ?
-                        <Triangle
-                            key={i}
-                            a={this.leftPoint(point, direction)}
-                            b={this.rightPoint(point, direction)}
-                            c={this.frontPoint(point, direction)}
-                            color="green"
-                        />
-                        : null
-                )}
-            </>
-        );
-    }
-}
+import { Quad } from "./Quad";
 
 interface IProps {
     areaWidth: number;
