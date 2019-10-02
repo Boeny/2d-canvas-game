@@ -1,14 +1,15 @@
 import React from "react";
+import { observable, action } from "mobx";
+import { observer } from "mobx-react";
+import { containerStore } from "stores/ContainerStore";
 import { ActiveComponent } from "models/ActiveComponent";
 import { KeysType } from "enums/KeysType";
 import { Vector2 } from "helpers";
-import { Quad } from "./Quad";
 import { VectorHelpers } from "helpers/VectorHelpers";
-import { containerStore } from "stores/ContainerStore";
-import { observable, action } from "mobx";
-import { observer } from "mobx-react";
+import { MovableObject } from "../MovableObject";
 
 interface IProps {
+    position: Vector2;
     createBullet: (position: Vector2, direction: Vector2, initialVelocity: Vector2) => void;
 }
 
@@ -28,7 +29,6 @@ export class Player extends ActiveComponent<IProps> {
     private BULLET_RECOIL = 50;
 
     private velocity = new Vector2();
-    private currentItemPosition = new Vector2();
     private up = false;
     private down = false;
     private left = false;
@@ -38,8 +38,8 @@ export class Player extends ActiveComponent<IProps> {
 
     @observable
     private gameState: IState = {
-        position: new Vector2(),
-        direction: Vector2.up,
+        position: this.props.position,
+        direction: Vector2.up
     };
 
     @action
@@ -68,7 +68,7 @@ export class Player extends ActiveComponent<IProps> {
     }
 
     public onGameLoop = (deltaTimeSec: number) => {
-        const { direction } = this.gameState;
+        const { position, direction } = this.gameState;
 
         if (this.left) {
             direction.rotateNormalized(this.MAX_ROTATION_SPEED * deltaTimeSec);
@@ -89,34 +89,29 @@ export class Player extends ActiveComponent<IProps> {
         this.timeToRecharge += deltaTimeSec;
         if (this.createBullet && (this.timeToRecharge === 0 || this.timeToRecharge > this.RECHARGING_TIME)) {
             this.timeToRecharge = 0;
-            this.props.createBullet(this.currentItemPosition, this.gameState.direction, this.velocity);
+            this.props.createBullet(
+                VectorHelpers.getTriangleFrontPoint(position, direction, this.SCALE),
+                direction,
+                this.velocity
+            );
             this.velocity.add(direction.clone().multScalar(-this.BULLET_RECOIL));
         }
 
         if (this.up || this.down || this.left || this.right || this.velocity.length > 0) {
             this.velocity.sub(this.velocity.clone().normalize().multScalar(this.FRICTION));
-            const position = containerStore.applyInfiniteMovement(this.gameState.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)));
-            this.setCurrentItemPosition(position);
-            this.setGameState({ position, direction });
+            this.setGameState({
+                position: containerStore.applyInfiniteMovement(position.clone().add(this.velocity.clone().multScalar(deltaTimeSec))),
+                direction
+            });
         }
-    }
-
-    setCurrentItemPosition(position: Vector2) {
-
-        const halfWidth = containerStore.halfWidth;
-        const halfHeight = containerStore.halfHeight;
-        const frontPoint = VectorHelpers.getTriangleFrontPoint(position, this.gameState.direction, this.SCALE);
-
-        this.currentItemPosition.x = frontPoint.x + (frontPoint.x < halfWidth ? halfWidth : -halfWidth);
-        this.currentItemPosition.y = frontPoint.y + (frontPoint.y < halfHeight ? halfHeight : -halfHeight);
     }
 
     public render() {
         return (
-            <Quad
+            <MovableObject
                 scale={this.SCALE}
                 color="green"
-                center={this.gameState.position}
+                position={this.gameState.position}
                 direction={this.gameState.direction}
             />
         );

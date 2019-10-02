@@ -4,9 +4,10 @@ import Konva from "konva";
 import { observer } from "mobx-react";
 import { activeStore } from "stores/ActiveStore";
 import { bulletStore } from "stores/BulletStore";
-import { Ground, Player, Bullets } from "components";
 import { containerStore } from "stores/ContainerStore";
 import { gameLoopStore } from "stores/GameLoopStore";
+import { Vector2 } from "helpers";
+import { Ground, Player, Bullets } from "components";
 
 @observer
 export class App extends React.PureComponent {
@@ -59,7 +60,14 @@ export class App extends React.PureComponent {
             >
                 <Layer>
                     <Ground />
-                    <Player createBullet={(...args) => bulletStore.createBullet(...args)} />
+                    {
+                        containerStore.width > 0 ?
+                            <Player
+                                position={new Vector2(containerStore.width / 2, containerStore.height / 2)}
+                                createBullet={(...args) => bulletStore.createBullet(...args)}
+                            />
+                            : null
+                    }
                     <Bullets />
                 </Layer>
             </Stage>
