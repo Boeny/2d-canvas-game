@@ -7,5 +7,5 @@ export class GameObjectComponent<P> extends React.PureComponent<P> implements IG
         gameLoopStore.addGameObject(this);
     }
 
-    public onGameLoop = () => {};
+    public onGameLoop = (delta: number) => {};
 }

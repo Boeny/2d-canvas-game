@@ -6,11 +6,15 @@ export interface IBullet {
     position: Vector2;
     velocity: Vector2;
     direction: Vector2;
+    time: number;
+    id: number;
 }
 
 class BulletStore {
 
-    private SPEED = 7;
+    private SPEED = 800;
+    private TIME_TO_LIVE = 3;
+    private index = 0;
 
     @observable
     public bullets: IBullet[] = [];
@@ -20,17 +24,22 @@ class BulletStore {
         this.bullets.push({
             position: position.clone(),
             velocity: initialVelocity.clone().add(direction.clone().multScalar(this.SPEED)),
-            direction: direction.clone()
+            direction: direction.clone(),
+            time: 0,
+            id: this.index
         });
+        this.index += 1;
     }
 
     @action
-    public move(bullet: IBullet) {
-        bullet.position = containerStore.applyInfiniteMovement(bullet.position.clone().add(bullet.velocity));
+    public move(bullet: IBullet,  deltaTimeSec: number) {
+        bullet.time += deltaTimeSec;
 
-        if (!containerStore.hasPointInside(bullet.position)) {
-            this.bullets.splice(this.bullets.indexOf(bullet), 1);
+        if (bullet.time > this.TIME_TO_LIVE) {
+            this.bullets = this.bullets.filter(b => b.id !== bullet.id);
+            return;
         }
+        bullet.position = containerStore.applyInfiniteMovement(bullet.position.clone().add(bullet.velocity.clone().multScalar(deltaTimeSec)));
     }
 }
 

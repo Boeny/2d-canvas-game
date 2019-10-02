@@ -11,8 +11,8 @@ interface IProps {
 @observer
 class Bullet extends GameObjectComponent<IProps> {
 
-    onGameLoop = () => {
-        bulletStore.move(this.props.bullet);
+    onGameLoop = (deltaTimeSec: number) => {
+        bulletStore.move(this.props.bullet, deltaTimeSec);
     }
 
     render() {
@@ -23,7 +23,7 @@ class Bullet extends GameObjectComponent<IProps> {
             <MovableObject
                 position={bullet.position}
                 direction={bullet.direction}
-                color="red"
+                color="#005500"
                 scale={5}
             />
         );
