@@ -2,8 +2,6 @@ import { isNullOrUndefined } from "util";
 
 export class Vector2 {
 
-    private readonly E = 0.0001;
-
     public static get up() {
         return new Vector2(0, 1);
     }
@@ -21,8 +19,8 @@ export class Vector2 {
         return a.x * b.x + a.y * b.y;
     }
 
-    public x: number = 0;
-    public y: number = 0;
+    public x = 0;
+    public y = 0;
 
     constructor(x?: number, y?: number) {
 
@@ -34,17 +32,15 @@ export class Vector2 {
         }
     }
 
-    public get xy() {
-        return { x: this.x, y: this.y };
-    }
-
     public get sqrLength(): number {
         return this.x * this.x + this.y * this.y;
     }
 
     public get length(): number {
-        const result = Math.sqrt(this.sqrLength);
-        return Math.abs(result) < this.E ? 0 : result;
+        return Math.sqrt(this.sqrLength);
+    }
+    public set length(length: number) {
+        this.normalize().multScalar(length);
     }
 
     public clone(): Vector2 {
@@ -101,12 +97,14 @@ export class Vector2 {
     }
 
     public normalize() {
-        this.divScalar(this.length);
-        return this;
+        return this.divScalar(this.length);
     }
 
     public rotate(deg: number) {
         const len = this.length;
+        if (len === 0) {
+            return this;
+        }
         this.divScalar(len);
         this.rotateNormalized(deg);
         this.multScalar(len);

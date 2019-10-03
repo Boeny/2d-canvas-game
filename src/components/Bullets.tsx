@@ -1,18 +1,20 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { bulletStore, IBullet } from "stores/BulletStore";
-import { MovableObject } from "./MovableObject";
-import { GameObjectComponent } from "models/GameObjectComponent";
+import { IBullet, BulletStore } from "stores/BulletStore";
+import { Vector2 } from "models";
+import { GameObjectComponent } from "components/GameObjectComponent";
+import { ScaledTriangle } from "./ScaledTriangle";
 
-interface IProps {
+interface IBulletProps {
     bullet: IBullet;
+    onUpdate: (bullet: IBullet, deltaTimeSec: number) => void;
 }
 
 @observer
-class Bullet extends GameObjectComponent<IProps> {
+class Bullet extends GameObjectComponent<IBulletProps> {
 
     onGameLoop = (deltaTimeSec: number) => {
-        bulletStore.move(this.props.bullet, deltaTimeSec);
+        this.props.onUpdate(this.props.bullet, deltaTimeSec);
     }
 
     render() {
@@ -20,7 +22,7 @@ class Bullet extends GameObjectComponent<IProps> {
         const { bullet } = this.props;
 
         return (
-            <MovableObject
+            <ScaledTriangle
                 position={bullet.position}
                 direction={bullet.direction}
                 color="#005500"
@@ -30,16 +32,22 @@ class Bullet extends GameObjectComponent<IProps> {
     }
 }
 
+interface IProps {
+    store: BulletStore;
+    applyInfiniteMovement: (position: Vector2) => Vector2;
+}
+
 @observer
-export class Bullets extends React.PureComponent {
+export class Bullets extends React.PureComponent<IProps> {
 
     render() {
         return (
             <>
-                {bulletStore.bullets.map((bullet, i) =>
+                {this.props.store.bullets.map((bullet, i) =>
                     <Bullet
                         key={i}
                         bullet={bullet}
+                        onUpdate={this.props.store.onUpdate}
                     />
                 )}
             </>

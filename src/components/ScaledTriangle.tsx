@@ -1,7 +1,6 @@
 import React from "react";
-import { Vector2 } from "helpers";
+import { Vector2 } from "models";
 import { VectorHelpers } from "helpers/VectorHelpers";
-import { containerStore } from "stores/ContainerStore";
 import { Triangle } from "./Triangle";
 
 interface IProps {
@@ -11,7 +10,7 @@ interface IProps {
     color: string;
 }
 
-export class MovableObject extends React.PureComponent<IProps> {
+export class ScaledTriangle extends React.PureComponent<IProps> {
 
     private WING_DEVIATION_ANGLE = 3 * Math.PI / 4;
 
@@ -34,9 +33,7 @@ export class MovableObject extends React.PureComponent<IProps> {
     render() {
 
         const { direction, position, color } = this.props;
-        if (!containerStore.hasShapeInside(position, this.props.scale)) {
-            return null;
-        }
+
         return (
             <Triangle
                 a={this.leftPoint(position, direction)}

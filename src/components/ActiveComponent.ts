@@ -1,6 +1,5 @@
-import { activeStore } from "stores/ActiveStore";
+import { activeObject, IGameObjectComponent } from "models";
 import { GameObjectComponent } from "./GameObjectComponent";
-import { IGameObjectComponent } from "stores/GameLoopStore";
 
 export interface IActiveComponent {
     onKeyDown: (e: KeyboardEvent) => void;
@@ -18,6 +17,6 @@ export class ActiveComponent<P> extends GameObjectComponent<P> implements IActiv
 
     componentDidMount() {
         super.componentDidMount();
-        activeStore.setActive(this);
+        activeObject.setInstance(this);
     }
 }

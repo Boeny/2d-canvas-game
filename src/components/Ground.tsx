@@ -1,24 +1,17 @@
 import React from "react";
 import { Rect as KRect } from "react-konva";
-import { observer } from "mobx-react";
-import { containerStore } from "stores/ContainerStore";
 
 interface IProps {
-    onClick?: () => void;
+    width: number;
+    height: number;
 }
 
-@observer
-export class Ground extends React.PureComponent<IProps> {
-
-    render() {
-        return (
-            <KRect
-                x={0}
-                y={0}
-                width={containerStore.width}
-                height={containerStore.height}
-                fill="grey"
-            />
-        );
-    }
+export function Ground(props: IProps) {
+    return (
+        <KRect
+            x={0}
+            y={0}
+            {...props}
+        />
+    );
 }

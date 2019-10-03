@@ -4,17 +4,19 @@ export interface IGameObjectComponent {
     onGameLoop: (delta: number) => void;
 }
 
-class GameLoopStore {
+class GameLoop {
 
     gameObjects: IGameObjectComponent[] = [];
 
     prevTime = 0;
 
     run = (time = 100) => {
+        requestAnimationFrame(this.run);
+
         const deltaTimeSec = Math.min(100, time - this.prevTime) / 1000;
         this.prevTime = time;
+
         runInAction(() => this.gameObjects.forEach(o => o.onGameLoop(deltaTimeSec)));
-        requestAnimationFrame(this.run);
     }
 
     addGameObject(gameObject: IGameObjectComponent) {
@@ -22,4 +24,4 @@ class GameLoopStore {
     }
 }
 
-export const gameLoopStore = new GameLoopStore();
+export const gameLoop = new GameLoop();

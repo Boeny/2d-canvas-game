@@ -1,6 +1,6 @@
 import React from "react";
 import { Line as KLine } from "react-konva";
-import { Vector2 } from "helpers";
+import { Vector2 } from "models";
 
 interface IProps {
     a: Vector2;
