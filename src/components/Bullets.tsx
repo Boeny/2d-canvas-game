@@ -1,7 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { IBullet, BulletStore } from "stores/BulletStore";
-import { Vector2 } from "models";
 import { GameObjectComponent } from "components/GameObjectComponent";
 import { ScaledTriangle } from "./ScaledTriangle";
 
@@ -25,7 +24,7 @@ class Bullet extends GameObjectComponent<IBulletProps> {
             <ScaledTriangle
                 position={bullet.position}
                 direction={bullet.direction}
-                color="#005500"
+                color={bullet.type === "player" ? "#005500" : "#550000"}
                 scale={5}
             />
         );
@@ -34,7 +33,6 @@ class Bullet extends GameObjectComponent<IBulletProps> {
 
 interface IProps {
     store: BulletStore;
-    applyInfiniteMovement: (position: Vector2) => Vector2;
 }
 
 @observer

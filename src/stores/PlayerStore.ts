@@ -18,6 +18,7 @@ export class PlayerStore {
     private FRICTION = 2;
     private RECHARGING_TIME = 0.1;
     private BULLET_RECOIL = 50;
+    public MAX_HEALTH = 100;
 
     private velocity = new Vector2();
     private timeToRecharge = 0;
@@ -31,6 +32,7 @@ export class PlayerStore {
 
     @observable public position: Vector2;
     @observable public direction: Vector2;
+    @observable public health = this.MAX_HEALTH;
 
     constructor(
         position: Vector2,
@@ -81,5 +83,14 @@ export class PlayerStore {
             this.velocity.length = length > this.FRICTION ? length - this.FRICTION : 0;
             this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)));
         }
+    }
+
+    public inArea(position: Vector2): boolean {
+        return this.position.distance(position) < this.SCALE;
+    }
+
+    @action
+    public takeDamage(damage: number) {
+        this.health = this.health > damage ? this.health - damage : 0;
     }
 }

@@ -1,13 +1,30 @@
 import React from "react";
-import { Enemy, IProps } from "./Enemy";
-import { Helpers } from "helpers";
+import { Enemy } from "./Enemy";
+import { EnemiesStore } from "stores/EnemiesStore";
+import { ObjectWithHealth } from "components/ObjectWithHealth";
+
+interface IProps {
+    store: EnemiesStore;
+}
 
 export class Enemies extends React.PureComponent<IProps> {
 
     render() {
         return (
             <>
-                {Helpers.range(1).map(() => <Enemy {...this.props} />)}
+                {this.props.store.data.map(store =>
+                    <ObjectWithHealth
+                        store={store}
+                        component={store =>
+                            <Enemy
+                                scale={store.SCALE}
+                                position={store.position}
+                                direction={store.direction}
+                                onUpdate={store.onUpdate}
+                            />
+                        }
+                    />
+                )}
             </>
         );
     }

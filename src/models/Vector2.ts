@@ -117,4 +117,8 @@ export class Vector2 {
         this.y = Math.sin(angle);
         return this;
     }
+
+    public distance(position: Vector2): number {
+        return this.clone().sub(position).length;
+    }
 }

@@ -1,12 +1,11 @@
 import React from "react";
-import { observer } from "mobx-react";
-import { PlayerStore, IActions } from "stores/PlayerStore";
+import { IActions } from "stores/PlayerStore";
 import { KeysType } from "enums/KeysType";
 import { Vector2 } from "models";
 import { ActiveComponent } from "components/ActiveComponent";
 import { ScaledTriangle } from "./ScaledTriangle";
 
-interface IComponentProps {
+interface IProps {
     scale: number;
     position: Vector2;
     direction: Vector2;
@@ -14,7 +13,7 @@ interface IComponentProps {
     onUpdateActions: (actions: Partial<IActions>) => void;
 }
 
-export class PlayerComponent extends ActiveComponent<IComponentProps> {
+export class Player extends ActiveComponent<IProps> {
 
     public onKeyDown = (e: KeyboardEvent) => {
         switch (e.keyCode) {
@@ -47,30 +46,6 @@ export class PlayerComponent extends ActiveComponent<IComponentProps> {
                 color="green"
                 position={this.props.position}
                 direction={this.props.direction}
-            />
-        );
-    }
-}
-
-interface IProps {
-    position: Vector2;
-    applyInfiniteMovement: (position: Vector2) => Vector2;
-    createBullet: (position: Vector2, direction: Vector2, velocity: Vector2) => void;
-}
-
-@observer
-export class Player extends React.PureComponent<IProps> {
-
-    store = new PlayerStore(this.props.position, Math.PI / 2, this.props.applyInfiniteMovement, this.props.createBullet);
-
-    render() {
-        return (
-            <PlayerComponent
-                scale={this.store.SCALE}
-                position={this.store.position}
-                direction={this.store.direction}
-                onUpdate={this.store.onUpdate}
-                onUpdateActions={this.store.onUpdateActions}
             />
         );
     }

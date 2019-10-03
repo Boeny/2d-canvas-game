@@ -1,5 +1,5 @@
 import React from "react";
-import { Line as KLine } from "react-konva";
+import { Line } from "react-konva";
 import { Vector2 } from "models";
 
 interface IProps {
@@ -16,19 +16,17 @@ export class Triangle extends React.PureComponent<IProps> {
         const { a, b, c, color } = this.props;
 
         return (
-            <>
-                <KLine
-                    points={[
-                        a.x, window.innerHeight - a.y,
-                        b.x, window.innerHeight - b.y,
-                        c.x, window.innerHeight - c.y
-                    ]}
-                    closed={true}
-                    stroke={color}
-                    fill={color}
-                    shadowBlur={1}
-                />
-            </>
+            <Line
+                points={[
+                    a.x, window.innerHeight - a.y,
+                    b.x, window.innerHeight - b.y,
+                    c.x, window.innerHeight - c.y
+                ]}
+                closed={true}
+                stroke={color}
+                fill={color}
+                shadowBlur={1}
+            />
         );
     }
 }

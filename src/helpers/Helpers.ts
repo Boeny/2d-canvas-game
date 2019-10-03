@@ -32,10 +32,14 @@ export abstract class Helpers {
         return Array.from({ length: max + 1 - min }).map((_, i) => i + min);
     }
 
-    public static random(min: number, max?: number) {
+    public static random(min: number, max?: number): number {
         if (isNullOrUndefined(max) || min > max) {
             return Math.random() * min;
         }
         return Math.random() * (max - min) + min;
+    }
+
+    public static lerp(min: number, max: number, minValue: number, maxValue: number, value: number): number {
+        return value * (max - min) / (maxValue - minValue);
     }
 }
