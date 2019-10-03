@@ -2,7 +2,7 @@ import { observable, action } from "mobx";
 import { Vector2 } from "models";
 import { VectorHelpers } from "helpers/VectorHelpers";
 
-export interface IKeyEvents {
+export interface IActions {
     up: boolean;
     down: boolean;
     left: boolean;
@@ -21,40 +21,51 @@ export class PlayerStore {
 
     private velocity = new Vector2();
     private timeToRecharge = 0;
+    public actions: IActions = {
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+        createBullet: false
+    };
 
-    @observable public position = new Vector2();
-    @observable public direction = Vector2.up;
+    @observable public position: Vector2;
+    @observable public direction: Vector2;
 
     constructor(
         position: Vector2,
+        angle: number,
         private applyInfiniteMovement: (position: Vector2) => Vector2,
         private createBullet: (position: Vector2, direction: Vector2, velocity: Vector2) => void
     ) {
         this.position = position;
+        this.direction = Vector2.right.rotateNormalized(angle);
+    }
+
+    public onUpdateActions = (data: Partial<IActions>) => {
+        this.actions = { ...this.actions, ...data };
     }
 
     @action
-    public onUpdate = (deltaTimeSec: number, events: IKeyEvents) => {
+    public onUpdate = (deltaTimeSec: number) => {
 
-        if (events.left) {
+        if (this.actions.left) {
             this.direction.rotateNormalized(this.MAX_ROTATION_SPEED * deltaTimeSec);
         }
-        else
-        if (events.right) {
+        else if (this.actions.right) {
             this.direction.rotateNormalized(-this.MAX_ROTATION_SPEED * deltaTimeSec);
         }
 
-        if (events.up) {
+        if (this.actions.up) {
             this.velocity.add(this.direction.clone().multScalar(this.ACCELERATION));
         }
-        else
-        if (events.down) {
+        else if (this.actions.down) {
             this.velocity.add(this.direction.clone().multScalar(-this.ACCELERATION));
         }
 
         this.timeToRecharge += deltaTimeSec;
 
-        if (events.createBullet && (this.timeToRecharge === 0 || this.timeToRecharge > this.RECHARGING_TIME)) {
+        if (this.actions.createBullet && (this.timeToRecharge === 0 || this.timeToRecharge > this.RECHARGING_TIME)) {
             this.timeToRecharge = 0;
             this.createBullet(
                 VectorHelpers.getTriangleFrontPoint(this.position, this.direction, this.SCALE),
@@ -66,7 +77,7 @@ export class PlayerStore {
 
         const length = this.velocity.length;
 
-        if (events.up || events.down || length > 0) {
+        if (this.actions.up || this.actions.down || length > 0) {
             this.velocity.length = length > this.FRICTION ? length - this.FRICTION : 0;
             this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)));
         }

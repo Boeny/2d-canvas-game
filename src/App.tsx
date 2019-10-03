@@ -3,39 +3,14 @@ import { Stage, Layer } from "react-konva";
 import Konva from "konva";
 import { observer } from "mobx-react";
 import { ContainerStore } from "stores/ContainerStore";
-import { BulletStore } from "stores/BulletStore";
-import { activeObject, gameLoop, Vector2 } from "models";
-import { Ground, Player, Bullets } from "components";
+import { activeObject, gameLoop } from "models";
+import { Scene } from "Scene";
 
 @observer
 export class App extends React.PureComponent {
 
     private stage: Konva.Stage | null = null;
     private containerStore = new ContainerStore();
-
-    private applyInfiniteMovement = (position: Vector2): Vector2 => {
-
-        const { width, height } = this.containerStore;
-
-        if (position.x < 0) {
-            position.x += width;
-        }
-        else
-            if (position.x > width) {
-                position.x -= width;
-            }
-
-        if (position.y < 0) {
-            position.y += height;
-        }
-        else
-            if (position.y > height) {
-                position.y -= height;
-            }
-        return position;
-    }
-
-    private bulletStore = new BulletStore(this.applyInfiniteMovement);
 
     componentDidMount() {
         if (!this.stage) {
@@ -84,23 +59,14 @@ export class App extends React.PureComponent {
                 tabIndex={1}
             >
                 <Layer>
-                    <Ground
-                        width={width}
-                        height={height}
-                    />
                     {
                         width > 0 ?
-                            <Player
-                                position={new Vector2(width / 2, height / 2)}
-                                applyInfiniteMovement={this.applyInfiniteMovement}
-                                createBullet={this.bulletStore.createBullet}
+                            <Scene
+                                width={width}
+                                height={height}
                             />
                             : null
                     }
-                    <Bullets
-                        store={this.bulletStore}
-                        applyInfiniteMovement={this.applyInfiniteMovement}
-                    />
                 </Layer>
             </Stage>
         );

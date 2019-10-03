@@ -31,4 +31,11 @@ export abstract class Helpers {
         }
         return Array.from({ length: max + 1 - min }).map((_, i) => i + min);
     }
+
+    public static random(min: number, max?: number) {
+        if (isNullOrUndefined(max) || min > max) {
+            return Math.random() * min;
+        }
+        return Math.random() * (max - min) + min;
+    }
 }

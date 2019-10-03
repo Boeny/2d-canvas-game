@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { IKeyEvents, PlayerStore } from "stores/PlayerStore";
+import { PlayerStore, IActions } from "stores/PlayerStore";
 import { KeysType } from "enums/KeysType";
 import { Vector2 } from "models";
 import { ActiveComponent } from "components/ActiveComponent";
@@ -10,42 +10,34 @@ interface IComponentProps {
     scale: number;
     position: Vector2;
     direction: Vector2;
-    onUpdate: (deltaTimeSec: number, events: IKeyEvents) => void;
+    onUpdate: (deltaTimeSec: number) => void;
+    onUpdateActions: (actions: Partial<IActions>) => void;
 }
 
-@observer
 export class PlayerComponent extends ActiveComponent<IComponentProps> {
-
-    private events: IKeyEvents = {
-        up: false,
-        down: false,
-        left: false,
-        right: false,
-        createBullet: false
-    };
 
     public onKeyDown = (e: KeyboardEvent) => {
         switch (e.keyCode) {
-            case KeysType.up: this.events.up = true; this.events.down = false; break;
-            case KeysType.down: this.events.down = true; this.events.up = false; break;
-            case KeysType.left: this.events.left = true; this.events.right = false; break;
-            case KeysType.right: this.events.right = true; this.events.left = false; break;
-            case KeysType.space: this.events.createBullet = true; break;
+            case KeysType.up: this.props.onUpdateActions({ up: true, down: false }); break;
+            case KeysType.down: this.props.onUpdateActions({ down: true, up: false }); break;
+            case KeysType.left: this.props.onUpdateActions({ left: true, right: false }); break;
+            case KeysType.right: this.props.onUpdateActions({ right: true, left: false }); break;
+            case KeysType.space: this.props.onUpdateActions({ createBullet: true }); break;
         }
     }
 
     public onKeyUp = (e: KeyboardEvent) => {
         switch (e.keyCode) {
-            case KeysType.up: this.events.up = false; break;
-            case KeysType.down: this.events.down = false; break;
-            case KeysType.left: this.events.left = false; break;
-            case KeysType.right: this.events.right = false; break;
-            case KeysType.space: this.events.createBullet = false; break;
+            case KeysType.up: this.props.onUpdateActions({ up: false }); break;
+            case KeysType.down: this.props.onUpdateActions({ down: false }); break;
+            case KeysType.left: this.props.onUpdateActions({ left: false }); break;
+            case KeysType.right: this.props.onUpdateActions({ right: false }); break;
+            case KeysType.space: this.props.onUpdateActions({ createBullet: false }); break;
         }
     }
 
     public onGameLoop = (deltaTimeSec: number) => {
-        this.props.onUpdate(deltaTimeSec, this.events);
+        this.props.onUpdate(deltaTimeSec);
     }
 
     public render() {
@@ -69,7 +61,7 @@ interface IProps {
 @observer
 export class Player extends React.PureComponent<IProps> {
 
-    store = new PlayerStore(this.props.position, this.props.applyInfiniteMovement, this.props.createBullet);
+    store = new PlayerStore(this.props.position, Math.PI / 2, this.props.applyInfiniteMovement, this.props.createBullet);
 
     render() {
         return (
@@ -78,6 +70,7 @@ export class Player extends React.PureComponent<IProps> {
                 position={this.store.position}
                 direction={this.store.direction}
                 onUpdate={this.store.onUpdate}
+                onUpdateActions={this.store.onUpdateActions}
             />
         );
     }
