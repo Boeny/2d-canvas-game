@@ -72,7 +72,6 @@ export class Player extends React.PureComponent<IProps> {
     store = new PlayerStore(this.props.position, this.props.applyInfiniteMovement, this.props.createBullet);
 
     render() {
-        console.log("render");
         return (
             <PlayerComponent
                 scale={this.store.SCALE}
