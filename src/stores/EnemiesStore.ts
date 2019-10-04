@@ -1,6 +1,7 @@
-import { Vector2 } from "models";
-import { Helpers } from "helpers";
 import { EnemyStore } from "./EnemyStore";
+import { Vector2 } from "models";
+import { VectorHelpers } from "helpers/VectorHelpers";
+import { Helpers } from "helpers";
 
 export class EnemiesStore {
 
@@ -13,6 +14,13 @@ export class EnemiesStore {
         applyInfiniteMovement: (position: Vector2) => Vector2,
         createBullet: (position: Vector2, direction: Vector2, velocity: Vector2) => void
     ) {
-        this.data = Helpers.range(this.COUNT).map(() => new EnemyStore(width, height, applyInfiniteMovement, createBullet));
+        this.data = Helpers.range(this.COUNT).map(() => {
+            return new EnemyStore(
+                VectorHelpers.random(width, height),
+                Helpers.random(0, Math.PI * 2),
+                applyInfiniteMovement,
+                createBullet
+            );
+        });
     }
 }
