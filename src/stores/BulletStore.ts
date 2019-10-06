@@ -1,11 +1,17 @@
 import { observable, action } from "mobx";
 import { Vector2 } from "models";
+import { PlayerStore } from "./PlayerStore";
 
-export interface IBullet {
+interface CommonObject {
     type: "player" | "enemy";
     position: Vector2;
-    velocity: Vector2;
     direction: Vector2;
+    velocity: Vector2;
+    hasCollision: (bullet: IBullet) => PlayerStore | undefined;
+    onCollide: (bullet: IBullet, p: PlayerStore) => void;
+}
+
+export interface IBullet extends CommonObject {
     time: number;
     id: number;
     damage: number;
@@ -23,17 +29,16 @@ export class BulletStore {
     public bullets: IBullet[] = [];
 
     constructor(
-        private applyInfiniteMovement: (position: Vector2) => Vector2,
-        private hasCollisionWith: (bullet: IBullet) => boolean
+        private applyInfiniteMovement: (position: Vector2) => Vector2
     ) {}
 
     @action
-    public createBullet = (type: "player" | "enemy", position: Vector2, direction: Vector2, initialVelocity: Vector2) => {
+    public createBullet = (o: CommonObject) => {
         this.bullets.push({
-            type,
-            position: position.clone(),
-            velocity: initialVelocity.clone().add(direction.clone().multScalar(this.SPEED)),
-            direction: direction.clone(),
+            ...o,
+            position: o.position.clone(),
+            velocity: o.velocity.clone().add(o.direction.clone().multScalar(this.SPEED)),
+            direction: o.direction.clone(),
             time: 0,
             id: this.index,
             damage: this.DAMAGE
@@ -45,8 +50,14 @@ export class BulletStore {
     public onUpdate = (bullet: IBullet,  deltaTimeSec: number) => {
         bullet.time += deltaTimeSec;
 
-        if (bullet.time > this.TIME_TO_LIVE) {// || this.hasCollisionWith(bullet)) {
-            this.bullets.splice(this.bullets.findIndex(b => b.id === bullet.id), 1);
+        if (bullet.time > this.TIME_TO_LIVE) {
+            this.bullets = this.bullets.filter(b => b.id !== bullet.id);
+            return;
+        }
+        const collider = bullet.hasCollision(bullet);
+        if (collider) {
+            // this.bullets = this.bullets.filter(b => b.id !== bullet.id);
+            bullet.onCollide(bullet, collider);
             return;
         }
         bullet.position = this.applyInfiniteMovement(bullet.position.clone().add(bullet.velocity.clone().multScalar(deltaTimeSec)));

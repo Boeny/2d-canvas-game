@@ -8,6 +8,7 @@ export interface IActions {
     left: boolean;
     right: boolean;
     createBullet: boolean;
+    takeDamage: number;
 }
 
 export class PlayerStore {
@@ -17,7 +18,7 @@ export class PlayerStore {
     private MAX_ROTATION_SPEED = 10;
     private FRICTION = 2;
     private RECHARGING_TIME = 0.1;
-    private BULLET_RECOIL = 50;
+    private BULLET_RECOIL = 30;
     public MAX_HEALTH = 100;
 
     private velocity = new Vector2();
@@ -27,7 +28,8 @@ export class PlayerStore {
         down: false,
         left: false,
         right: false,
-        createBullet: false
+        createBullet: false,
+        takeDamage: 0
     };
 
     @observable public position: Vector2;
@@ -51,11 +53,16 @@ export class PlayerStore {
     @action
     public onUpdate = (deltaTimeSec: number) => {
 
+        if (this.actions.takeDamage > 0) {
+            this.health = this.health > this.actions.takeDamage ? this.health - this.actions.takeDamage : 0;
+            this.actions.takeDamage = 0;
+        }
+
         if (this.actions.left) {
-            this.direction.rotateNormalized(this.MAX_ROTATION_SPEED * deltaTimeSec);
+            this.direction = this.direction.clone().rotateNormalized(this.MAX_ROTATION_SPEED * deltaTimeSec);
         }
         else if (this.actions.right) {
-            this.direction.rotateNormalized(-this.MAX_ROTATION_SPEED * deltaTimeSec);
+            this.direction = this.direction.clone().rotateNormalized(-this.MAX_ROTATION_SPEED * deltaTimeSec);
         }
 
         if (this.actions.up) {
@@ -87,10 +94,5 @@ export class PlayerStore {
 
     public inArea(position: Vector2): boolean {
         return this.position.distance(position) < this.SCALE;
-    }
-
-    @action
-    public takeDamage(damage: number) {
-        this.health = this.health > damage ? this.health - damage : 0;
     }
 }

@@ -12,8 +12,9 @@ export class Enemies extends React.PureComponent<IProps> {
     render() {
         return (
             <>
-                {this.props.store.data.map(store =>
+                {this.props.store.data.map((store, i) =>
                     <ObjectWithHealth
+                        key={i}
                         store={store}
                         component={store =>
                             <Enemy

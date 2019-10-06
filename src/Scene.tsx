@@ -1,7 +1,7 @@
 import React from "react";
 import { PlayerStore } from "stores/PlayerStore";
 import { EnemiesStore } from "stores/EnemiesStore";
-import { BulletStore, IBullet } from "stores/BulletStore";
+import { BulletStore } from "stores/BulletStore";
 import { Vector2 } from "models";
 import { Player, Bullets, Ground, Enemies } from "components";
 import { ObjectWithHealth } from "components/ObjectWithHealth";
@@ -12,6 +12,10 @@ interface IProps {
 }
 
 export class Scene extends React.Component<IProps> {
+
+    private bulletStore: BulletStore;
+    private playerStore: PlayerStore;
+    private enemiesStore: EnemiesStore;
 
     private applyInfiniteMovement = (position: Vector2): Vector2 => {
 
@@ -33,43 +37,39 @@ export class Scene extends React.Component<IProps> {
         return position;
     }
 
-    private hasCollisionWith = (bullet: IBullet): boolean => {
+    constructor(props: IProps) {
+        super(props);
 
-        let hasCollision = false;
+        this.bulletStore = new BulletStore(this.applyInfiniteMovement);
 
-        if (bullet.type === "enemy") {
-            hasCollision = this.playerStore.inArea(bullet.position);
-            if (hasCollision) {
-                this.playerStore.takeDamage(bullet.damage);
-            }
-        }
-        else {
-            hasCollision = this.enemiesStore.data.some(enemy => {
-                const damage = enemy.inArea(bullet.position);
-                if (damage) {
-                    enemy.takeDamage(bullet.damage);
-                }
-                return damage;
-            });
-        }
-        return hasCollision;
+        this.playerStore = new PlayerStore(
+            new Vector2(this.props.width / 2, this.props.height / 2),
+            Math.PI / 2,
+            this.applyInfiniteMovement,
+            (position, direction, velocity) => this.bulletStore.createBullet({
+                type: "player",
+                position,
+                direction,
+                velocity,
+                hasCollision: bullet => this.enemiesStore.data.find(enemy => enemy.inArea(bullet.position)),
+                onCollide: (bullet, enemy) => enemy && enemy.onUpdateActions({ takeDamage: bullet.damage })
+            })
+        );
+
+        this.enemiesStore = new EnemiesStore(
+            this.props.width,
+            this.props.height,
+            this.applyInfiniteMovement,
+            (position, direction, velocity) => this.bulletStore.createBullet({
+                type: "enemy",
+                position,
+                direction,
+                velocity,
+                hasCollision: bullet => this.playerStore.inArea(bullet.position) ? this.playerStore : undefined,
+                onCollide: (bullet, player) => player.onUpdateActions({ takeDamage: bullet.damage })
+            })
+        );
     }
-
-    private bulletStore = new BulletStore(this.applyInfiniteMovement, this.hasCollisionWith);
-
-    private playerStore = new PlayerStore(
-        new Vector2(this.props.width / 2, this.props.height / 2),
-        Math.PI / 2,
-        this.applyInfiniteMovement,
-        (...args) => this.bulletStore.createBullet("player", ...args)
-    );
-
-    private enemiesStore = new EnemiesStore(
-        this.props.width,
-        this.props.height,
-        this.applyInfiniteMovement,
-        (...args) => this.bulletStore.createBullet("enemy", ...args)
-    );
 
     render() {
 
