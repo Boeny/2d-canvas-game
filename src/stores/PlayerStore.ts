@@ -9,6 +9,7 @@ export interface IActions {
     right: boolean;
     createBullet: boolean;
     takeDamage: number;
+    feed: number;
 }
 
 export class PlayerStore {
@@ -17,9 +18,13 @@ export class PlayerStore {
     private ACCELERATION = 10;
     private MAX_ROTATION_SPEED = 10;
     private FRICTION = 2;
-    private RECHARGING_TIME = 0.1;
+    private RECHARGING_TIME = 0.2;
     private BULLET_RECOIL = 30;
     public MAX_HEALTH = 100;
+    private ENERGY_FOR_LIFE = 5;
+    private ENERGY_FOR_ROTATE = 7;
+    private ENERGY_FOR_MOVE = 10;
+    private ENERGY_FOR_SHOT = 15;
 
     private velocity = new Vector2();
     private timeToRecharge = 0;
@@ -29,7 +34,8 @@ export class PlayerStore {
         left: false,
         right: false,
         createBullet: false,
-        takeDamage: 0
+        takeDamage: 0,
+        feed: 0
     };
 
     @observable public position: Vector2;
@@ -39,37 +45,47 @@ export class PlayerStore {
     constructor(
         position: Vector2,
         angle: number,
-        private applyInfiniteMovement: (position: Vector2) => Vector2,
+        private applyInfiniteMovement: (position: Vector2, radius: number) => Vector2,
         private createBullet: (position: Vector2, direction: Vector2, velocity: Vector2) => void
     ) {
-        this.position = position;
+        this.position = applyInfiniteMovement(position, this.SCALE);
         this.direction = Vector2.right.rotateNormalized(angle);
     }
 
-    public onUpdateActions = (data: Partial<IActions>) => {
+    public updateActions = (data: Partial<IActions>) => {
         this.actions = { ...this.actions, ...data };
     }
 
     @action
     public onUpdate = (deltaTimeSec: number) => {
 
+        this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_LIFE * deltaTimeSec);
+
         if (this.actions.takeDamage > 0) {
-            this.health = this.health > this.actions.takeDamage ? this.health - this.actions.takeDamage : 0;
+            this.health = this.decreaseLengthBy(this.health, this.actions.takeDamage);
             this.actions.takeDamage = 0;
+        }
+        if (this.actions.feed > 0) {
+            this.health = this.increaseHealthBy(this.health, this.actions.feed);
+            this.actions.feed = 0;
         }
 
         if (this.actions.left) {
             this.direction = this.direction.clone().rotateNormalized(this.MAX_ROTATION_SPEED * deltaTimeSec);
+            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_ROTATE * deltaTimeSec);
         }
         else if (this.actions.right) {
             this.direction = this.direction.clone().rotateNormalized(-this.MAX_ROTATION_SPEED * deltaTimeSec);
+            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_ROTATE * deltaTimeSec);
         }
 
         if (this.actions.up) {
             this.velocity.add(this.direction.clone().multScalar(this.ACCELERATION));
+            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_MOVE * deltaTimeSec);
         }
         else if (this.actions.down) {
             this.velocity.add(this.direction.clone().multScalar(-this.ACCELERATION));
+            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_MOVE * deltaTimeSec);
         }
 
         this.timeToRecharge += deltaTimeSec;
@@ -82,17 +98,26 @@ export class PlayerStore {
                 this.velocity
             );
             this.velocity.add(this.direction.clone().multScalar(-this.BULLET_RECOIL));
+            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_SHOT);
         }
 
         const length = this.velocity.length;
 
-        if (this.actions.up || this.actions.down || length > 0) {
-            this.velocity.length = length > this.FRICTION ? length - this.FRICTION : 0;
-            this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)));
+        if (length > 0) {
+            this.velocity.length = this.decreaseLengthBy(length, this.FRICTION);
+            this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)), this.SCALE);
         }
     }
 
-    public inArea(position: Vector2): boolean {
-        return this.position.distance(position) < this.SCALE;
+    private decreaseLengthBy(length: number, delta: number): number {
+        return length > delta ? length - delta : 0;
+    }
+
+    private increaseHealthBy(length: number, delta: number): number {
+        return length + delta < this.MAX_HEALTH ? length + delta : this.MAX_HEALTH;
+    }
+
+    public inArea(position: Vector2, radius: number): boolean {
+        return this.position.distance(position) < this.SCALE + radius;
     }
 }

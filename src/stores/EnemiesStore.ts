@@ -11,7 +11,7 @@ export class EnemiesStore {
     constructor(
         width: number,
         height: number,
-        applyInfiniteMovement: (position: Vector2) => Vector2,
+        applyInfiniteMovement: (position: Vector2, radius: number) => Vector2,
         createBullet: (position: Vector2, direction: Vector2, velocity: Vector2) => void
     ) {
         this.data = Helpers.range(this.COUNT).map(() => {

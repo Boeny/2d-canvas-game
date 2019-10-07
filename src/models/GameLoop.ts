@@ -22,6 +22,10 @@ class GameLoop {
     addGameObject(gameObject: IGameObjectComponent) {
         this.gameObjects.push(gameObject);
     }
+
+    removeGameObject(gameObject: IGameObjectComponent) {
+        this.gameObjects.splice(this.gameObjects.indexOf(gameObject), 1);
+    }
 }
 
 export const gameLoop = new GameLoop();

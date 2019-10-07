@@ -2,36 +2,42 @@ import React from "react";
 import { PlayerStore } from "stores/PlayerStore";
 import { EnemiesStore } from "stores/EnemiesStore";
 import { BulletStore } from "stores/BulletStore";
+import { FeedStore } from "stores/FeedStore";
 import { Vector2 } from "models";
-import { Player, Bullets, Ground, Enemies } from "components";
-import { ObjectWithHealth } from "components/ObjectWithHealth";
+import { Player, Bullets, Rect, Enemies, ObjectWithHealth, Feed } from "components";
+
+interface ICollider {
+    position: Vector2;
+    radius: number;
+}
 
 interface IProps {
     width: number;
     height: number;
 }
 
-export class Scene extends React.Component<IProps> {
+export class Scene extends React.PureComponent<IProps> {
 
     private bulletStore: BulletStore;
     private playerStore: PlayerStore;
     private enemiesStore: EnemiesStore;
+    private feedStore: FeedStore;
 
-    private applyInfiniteMovement = (position: Vector2): Vector2 => {
+    private applyInfiniteMovement = (position: Vector2, radius: number): Vector2 => {
 
         const { width, height } = this.props;
 
-        if (position.x < 0) {
+        if (position.x < radius) {
             position.x += width;
         }
-        else if (position.x > width) {
+        else if (position.x > width - radius) {
             position.x -= width;
         }
 
-        if (position.y < 0) {
+        if (position.y < radius) {
             position.y += height;
         }
-        else if (position.y > height) {
+        else if (position.y > height - radius) {
             position.y -= height;
         }
         return position;
@@ -50,9 +56,7 @@ export class Scene extends React.Component<IProps> {
                 type: "player",
                 position,
                 direction,
-                velocity,
-                hasCollision: bullet => this.enemiesStore.data.find(enemy => enemy.inArea(bullet.position)),
-                onCollide: (bullet, enemy) => enemy && enemy.onUpdateActions({ takeDamage: bullet.damage })
+                velocity
             })
         );
 
@@ -64,11 +68,19 @@ export class Scene extends React.Component<IProps> {
                 type: "enemy",
                 position,
                 direction,
-                velocity,
-                hasCollision: bullet => this.playerStore.inArea(bullet.position) ? this.playerStore : undefined,
-                onCollide: (bullet, player) => player.onUpdateActions({ takeDamage: bullet.damage })
+                velocity
             })
         );
+
+        this.feedStore = new FeedStore(this.props.width, this.props.height, this.applyInfiniteMovement);
+    }
+
+    private getPlayers(): PlayerStore[] {
+        return this.enemiesStore.data.concat(this.playerStore);
+    }
+
+    private onCollidePlayers(collider: ICollider): PlayerStore | undefined {
+        return this.getPlayers().find(x => x.inArea(collider.position, collider.radius));
     }
 
     render() {
@@ -77,9 +89,11 @@ export class Scene extends React.Component<IProps> {
 
         return (
             <>
-                <Ground
+                <Rect
+                    position={new Vector2()}
                     width={width}
                     height={height}
+                    color="white"
                 />
                 <ObjectWithHealth
                     store={this.playerStore}
@@ -89,12 +103,13 @@ export class Scene extends React.Component<IProps> {
                             position={store.position}
                             direction={store.direction}
                             onUpdate={store.onUpdate}
-                            onUpdateActions={store.onUpdateActions}
+                            onUpdateActions={store.updateActions}
                         />
                     }
                 />
                 <Enemies store={this.enemiesStore} />
-                <Bullets store={this.bulletStore} />
+                <Bullets store={this.bulletStore} onCollide={this.onCollidePlayers} />
+                <Feed store={this.feedStore} onCollide={this.onCollidePlayers} />
             </>
         );
     }

@@ -19,4 +19,9 @@ export class ActiveComponent<P> extends GameObjectComponent<P> implements IActiv
         super.componentDidMount();
         activeObject.setInstance(this);
     }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        activeObject.setInstance(null);
+    }
 }

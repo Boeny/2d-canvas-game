@@ -3,9 +3,13 @@ import { gameLoop, IGameObjectComponent } from "models";
 
 export class GameObjectComponent<P> extends React.Component<P> implements IGameObjectComponent {
 
+    public onGameLoop = (delta: number) => {};
+
     componentDidMount() {
         gameLoop.addGameObject(this);
     }
 
-    public onGameLoop = (delta: number) => {};
+    componentWillUnmount() {
+        gameLoop.removeGameObject(this);
+    }
 }

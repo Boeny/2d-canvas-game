@@ -3,29 +3,40 @@ import { observer } from "mobx-react";
 import { IBullet, BulletStore } from "stores/BulletStore";
 import { GameObjectComponent } from "components/GameObjectComponent";
 import { ScaledTriangle } from "./ScaledTriangle";
+import { PlayerStore } from "stores/PlayerStore";
 
 interface IBulletProps {
+    scale: number;
     bullet: IBullet;
-    onUpdate: (bullet: IBullet, deltaTimeSec: number) => void;
+    move: (deltaTimeSec: number) => void;
+    onCollide: () => PlayerStore | undefined;
+    remove: () => void;
 }
 
 @observer
 class Bullet extends GameObjectComponent<IBulletProps> {
 
     onGameLoop = (deltaTimeSec: number) => {
-        this.props.onUpdate(this.props.bullet, deltaTimeSec);
+        const collider = this.props.onCollide();
+        if (collider) {
+            collider.updateActions({ takeDamage: this.props.bullet.damage });
+            this.props.remove();
+        }
+        else {
+            this.props.move(deltaTimeSec);
+        }
     }
 
     render() {
 
-        const { bullet } = this.props;
+        const { bullet, scale } = this.props;
 
         return (
             <ScaledTriangle
                 position={bullet.position}
                 direction={bullet.direction}
                 color={bullet.type === "player" ? "#005500" : "#550000"}
-                scale={5}
+                scale={scale}
             />
         );
     }
@@ -33,6 +44,7 @@ class Bullet extends GameObjectComponent<IBulletProps> {
 
 interface IProps {
     store: BulletStore;
+    onCollide: (bullet: IBullet) => PlayerStore | undefined;
 }
 
 @observer
@@ -45,7 +57,10 @@ export class Bullets extends React.PureComponent<IProps> {
                     <Bullet
                         key={i}
                         bullet={bullet}
-                        onUpdate={this.props.store.onUpdate}
+                        scale={this.props.store.SCALE}
+                        move={delta => this.props.store.move(bullet, delta)}
+                        onCollide={() => this.props.onCollide(bullet)}
+                        remove={() => this.props.store.remove(bullet.id)}
                     />
                 )}
             </>
