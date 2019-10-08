@@ -1,6 +1,7 @@
 import { PlayerStore, EnemiesStore, BulletStore, FoodStore } from "stores";
 import { ICollider, IBullet } from "interfaces";
 import { Vector2 } from "./Vector2";
+import { VectorHelpers } from "helpers/VectorHelpers";
 
 export class CompositionRoot {
 
@@ -21,13 +22,16 @@ export class CompositionRoot {
         );
 
         this.enemiesStore = new EnemiesStore(
-            this.width,
-            this.height,
+            this.getRandomPosition,
             this.applyInfiniteMovement,
             this.bulletStore.createBullet
         );
 
-        this.foodStore = new FoodStore(width, height, this.applyInfiniteMovement);
+        this.foodStore = new FoodStore(this.getRandomPosition, this.applyInfiniteMovement);
+    }
+
+    private getRandomPosition = (): Vector2 => {
+        return VectorHelpers.random(this.width, this.height);
     }
 
     public setSize(width: number, height: number) {
@@ -35,19 +39,20 @@ export class CompositionRoot {
         this.height = height;
     }
 
-    private applyInfiniteMovement = (position: Vector2, radius: number): Vector2 => {
+    public applyInfiniteMovement = (_position: Vector2, radius: number): Vector2 => {
+        const position = _position.clone();
 
-        if (position.x < radius) {
+        if (position.x < 0) {
             position.x += this.width;
         }
-        else if (position.x > this.width - radius) {
+        else if (position.x > this.width) {
             position.x -= this.width;
         }
 
-        if (position.y < radius) {
+        if (position.y < 0) {
             position.y += this.height;
         }
-        else if (position.y > this.height - radius) {
+        else if (position.y > this.height) {
             position.y -= this.height;
         }
         return position;
@@ -58,6 +63,7 @@ export class CompositionRoot {
     }
 
     public onCollidePlayer = (bullet: IBullet): PlayerStore | undefined => {
+        console.log(this.playerStore.inArea(bullet.position, bullet.radius));
         const player = this.playerStore.inArea(bullet.position, bullet.radius) ? this.playerStore : undefined;
         if (player) {
             player.updateActions({ takeDamage: bullet.damage });
@@ -66,6 +72,7 @@ export class CompositionRoot {
     }
 
     public onCollideFood = (collider: ICollider): number => {
+        console.log(this.foodStore.inArea(collider.position, collider.radius));
         const food = this.foodStore.inArea(collider.position, collider.radius) ? this.foodStore.ENERGY : 0;
         if (food > 0) {
             this.foodStore.setPosition();

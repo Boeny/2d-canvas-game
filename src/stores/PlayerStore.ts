@@ -61,7 +61,7 @@ export class PlayerStore {
         // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_LIFE * deltaTimeSec);
 
         if (this.actions.takeDamage > 0) {
-            // this.health = this.decreaseLengthBy(this.health, this.actions.takeDamage);
+            this.health = this.decreaseLengthBy(this.health, this.actions.takeDamage);
             this.actions.takeDamage = 0;
         }
         if (food > 0) {

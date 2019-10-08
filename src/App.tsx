@@ -35,7 +35,7 @@ export class App extends React.PureComponent {
             e.preventDefault();
             activeObject.instance && activeObject.instance.onKeyPress(e);
         });
-        document.onresize = this.reSize;
+        window.addEventListener("resize", this.reSize);
 
         this.reSize();
         gameLoop.run();
