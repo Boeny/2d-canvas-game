@@ -2,7 +2,7 @@ import { observable, action } from "mobx";
 import { Vector2 } from "models";
 import { VectorHelpers } from "helpers/VectorHelpers";
 
-export class FeedStore {
+export class FoodStore {
 
     public radius = 10;
     public ENERGY = 20;
@@ -15,7 +15,11 @@ export class FeedStore {
     }
 
     @action
-    setPosition() {
-        this.position = this.applyInfiniteMovement(VectorHelpers.random(this.width, this.height), this.radius);
+    public setPosition() {
+        this.position = this.applyInfiniteMovement(this.getPosition(), this.radius);
+    }
+
+    public inArea(position: Vector2, radius: number): boolean {
+        return this.position.distance(position) < this.radius + radius;
     }
 }

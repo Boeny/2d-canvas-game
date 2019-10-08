@@ -1,8 +1,5 @@
 import { runInAction } from "mobx";
-
-export interface IGameObjectComponent {
-    onGameLoop: (delta: number) => void;
-}
+import { IGameObjectComponent } from "components/GameObjectComponent";
 
 class GameLoop {
 

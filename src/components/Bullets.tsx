@@ -1,6 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { IBullet, BulletStore } from "stores/BulletStore";
+import { BulletStore } from "stores/BulletStore";
+import { IBullet } from "interfaces";
 import { GameObjectComponent } from "components/GameObjectComponent";
 import { ScaledTriangle } from "./ScaledTriangle";
 import { PlayerStore } from "stores/PlayerStore";
@@ -19,7 +20,6 @@ class Bullet extends GameObjectComponent<IBulletProps> {
     onGameLoop = (deltaTimeSec: number) => {
         const collider = this.props.onCollide();
         if (collider) {
-            collider.updateActions({ takeDamage: this.props.bullet.damage });
             this.props.remove();
         }
         else {
@@ -57,7 +57,7 @@ export class Bullets extends React.PureComponent<IProps> {
                     <Bullet
                         key={i}
                         bullet={bullet}
-                        scale={this.props.store.SCALE}
+                        scale={bullet.radius}
                         move={delta => this.props.store.move(bullet, delta)}
                         onCollide={() => this.props.onCollide(bullet)}
                         remove={() => this.props.store.remove(bullet.id)}

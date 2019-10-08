@@ -1,6 +1,7 @@
 import { observable, action } from "mobx";
 import { Vector2 } from "models";
 import { VectorHelpers } from "helpers/VectorHelpers";
+import { IBaseBullet } from "interfaces";
 
 export interface IActions {
     up: boolean;
@@ -9,12 +10,11 @@ export interface IActions {
     right: boolean;
     createBullet: boolean;
     takeDamage: number;
-    feed: number;
 }
 
 export class PlayerStore {
 
-    public SCALE = 20;
+    public radius = 20;
     private ACCELERATION = 10;
     private MAX_ROTATION_SPEED = 10;
     private FRICTION = 2;
@@ -34,8 +34,7 @@ export class PlayerStore {
         left: false,
         right: false,
         createBullet: false,
-        takeDamage: 0,
-        feed: 0
+        takeDamage: 0
     };
 
     @observable public position: Vector2;
@@ -46,9 +45,9 @@ export class PlayerStore {
         position: Vector2,
         angle: number,
         private applyInfiniteMovement: (position: Vector2, radius: number) => Vector2,
-        private createBullet: (position: Vector2, direction: Vector2, velocity: Vector2) => void
+        private createBullet: (bullet: IBaseBullet) => void
     ) {
-        this.position = applyInfiniteMovement(position, this.SCALE);
+        this.position = applyInfiniteMovement(position, this.radius);
         this.direction = Vector2.right.rotateNormalized(angle);
     }
 
@@ -57,55 +56,55 @@ export class PlayerStore {
     }
 
     @action
-    public onUpdate = (deltaTimeSec: number) => {
+    public onUpdate = (deltaTimeSec: number, food: number) => {
 
-        this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_LIFE * deltaTimeSec);
+        // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_LIFE * deltaTimeSec);
 
         if (this.actions.takeDamage > 0) {
-            this.health = this.decreaseLengthBy(this.health, this.actions.takeDamage);
+            // this.health = this.decreaseLengthBy(this.health, this.actions.takeDamage);
             this.actions.takeDamage = 0;
         }
-        if (this.actions.feed > 0) {
-            this.health = this.increaseHealthBy(this.health, this.actions.feed);
-            this.actions.feed = 0;
+        if (food > 0) {
+            this.health = this.increaseHealthBy(this.health, food);
         }
 
         if (this.actions.left) {
             this.direction = this.direction.clone().rotateNormalized(this.MAX_ROTATION_SPEED * deltaTimeSec);
-            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_ROTATE * deltaTimeSec);
+            // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_ROTATE * deltaTimeSec);
         }
         else if (this.actions.right) {
             this.direction = this.direction.clone().rotateNormalized(-this.MAX_ROTATION_SPEED * deltaTimeSec);
-            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_ROTATE * deltaTimeSec);
+            // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_ROTATE * deltaTimeSec);
         }
 
         if (this.actions.up) {
             this.velocity.add(this.direction.clone().multScalar(this.ACCELERATION));
-            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_MOVE * deltaTimeSec);
+            // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_MOVE * deltaTimeSec);
         }
         else if (this.actions.down) {
             this.velocity.add(this.direction.clone().multScalar(-this.ACCELERATION));
-            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_MOVE * deltaTimeSec);
+            // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_MOVE * deltaTimeSec);
         }
 
         this.timeToRecharge += deltaTimeSec;
 
         if (this.actions.createBullet && (this.timeToRecharge === 0 || this.timeToRecharge > this.RECHARGING_TIME)) {
             this.timeToRecharge = 0;
-            this.createBullet(
-                VectorHelpers.getTriangleFrontPoint(this.position, this.direction, this.SCALE),
-                this.direction,
-                this.velocity
-            );
+            this.createBullet({
+                type: "player",
+                position: VectorHelpers.getTriangleFrontPoint(this.position, this.direction, this.radius),
+                direction: this.direction.clone(),
+                velocity: this.velocity.clone()
+            });
             this.velocity.add(this.direction.clone().multScalar(-this.BULLET_RECOIL));
-            this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_SHOT);
+            // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_SHOT);
         }
 
         const length = this.velocity.length;
 
         if (length > 0) {
             this.velocity.length = this.decreaseLengthBy(length, this.FRICTION);
-            this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)), this.SCALE);
+            this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)), this.radius);
         }
     }
 
@@ -118,6 +117,6 @@ export class PlayerStore {
     }
 
     public inArea(position: Vector2, radius: number): boolean {
-        return this.position.distance(position) < this.SCALE + radius;
+        return this.position.distance(position) < this.radius + radius;
     }
 }

@@ -2,6 +2,7 @@ import { EnemyStore } from "./EnemyStore";
 import { Vector2 } from "models";
 import { VectorHelpers } from "helpers/VectorHelpers";
 import { Helpers } from "helpers";
+import { IBaseBullet } from "interfaces";
 
 export class EnemiesStore {
 
@@ -12,7 +13,7 @@ export class EnemiesStore {
         width: number,
         height: number,
         applyInfiniteMovement: (position: Vector2, radius: number) => Vector2,
-        createBullet: (position: Vector2, direction: Vector2, velocity: Vector2) => void
+        createBullet: (bullet: IBaseBullet) => void
     ) {
         this.data = Helpers.range(this.COUNT).map(() => {
             return new EnemyStore(

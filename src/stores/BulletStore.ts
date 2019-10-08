@@ -1,19 +1,6 @@
 import { observable, action } from "mobx";
 import { Vector2 } from "models";
-
-interface CommonObject {
-    type: "player" | "enemy";
-    position: Vector2;
-    direction: Vector2;
-    velocity: Vector2;
-}
-
-export interface IBullet extends CommonObject {
-    time: number;
-    id: number;
-    damage: number;
-    radius: number;
-}
+import { IBaseBullet, IBullet } from "interfaces";
 
 export class BulletStore {
 
@@ -32,12 +19,10 @@ export class BulletStore {
     ) {}
 
     @action
-    public createBullet = (o: CommonObject) => {
+    public createBullet = (o: IBaseBullet) => {
         this.bullets.push({
             ...o,
-            position: o.position.clone(),
             velocity: o.velocity.clone().add(o.direction.clone().multScalar(this.SPEED)),
-            direction: o.direction.clone(),
             time: 0,
             id: this.index,
             damage: this.DAMAGE,
