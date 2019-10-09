@@ -27,11 +27,7 @@ export class CompositionRoot {
             this.bulletStore.createBullet
         );
 
-        this.foodStore = new FoodStore(this.getRandomPosition, this.applyInfiniteMovement);
-    }
-
-    private getRandomPosition = (): Vector2 => {
-        return VectorHelpers.random(this.width, this.height);
+        this.foodStore = new FoodStore(this.getRandomPosition());
     }
 
     public setSize(width: number, height: number) {
@@ -39,7 +35,7 @@ export class CompositionRoot {
         this.height = height;
     }
 
-    public applyInfiniteMovement = (_position: Vector2, radius: number): Vector2 => {
+    public applyInfiniteMovement = (_position: Vector2): Vector2 => {
         const position = _position.clone();
 
         if (position.x < 0) {
@@ -56,6 +52,10 @@ export class CompositionRoot {
             position.y -= this.height;
         }
         return position;
+    }
+
+    private getRandomPosition = (): Vector2 => {
+        return VectorHelpers.random(this.width, this.height);
     }
 
     private getPlayers = (): PlayerStore[] => {
@@ -75,7 +75,7 @@ export class CompositionRoot {
         console.log(this.foodStore.inArea(collider.position, collider.radius));
         const food = this.foodStore.inArea(collider.position, collider.radius) ? this.foodStore.ENERGY : 0;
         if (food > 0) {
-            this.foodStore.setPosition();
+            this.foodStore.setPosition(this.getRandomPosition());
         }
         return food;
     }

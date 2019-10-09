@@ -9,13 +9,13 @@ export class FoodStore {
     @observable
     public position = new Vector2();
 
-    constructor(private getPosition: () => Vector2, private applyInfiniteMovement: (position: Vector2, radius: number) => Vector2) {
-        this.setPosition();
+    constructor(position: Vector2) {
+        this.setPosition(position);
     }
 
     @action
-    public setPosition() {
-        this.position = this.applyInfiniteMovement(this.getPosition(), this.radius);
+    public setPosition(position: Vector2) {
+        this.position = position;
     }
 
     public inArea(position: Vector2, radius: number): boolean {

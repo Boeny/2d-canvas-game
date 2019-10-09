@@ -9,13 +9,13 @@ export class EnemiesStore {
     public data: EnemyStore[];
 
     constructor(
-        getPosition: () => Vector2,
-        applyInfiniteMovement: (position: Vector2, radius: number) => Vector2,
+        getRandomPosition: () => Vector2,
+        applyInfiniteMovement: (position: Vector2) => Vector2,
         createBullet: (bullet: IBaseBullet) => void
     ) {
         this.data = Helpers.range(this.COUNT).map(() => {
             return new EnemyStore(
-                getPosition(),
+                getRandomPosition(),
                 Helpers.random(0, Math.PI * 2),
                 applyInfiniteMovement,
                 createBullet

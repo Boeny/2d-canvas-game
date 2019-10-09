@@ -37,18 +37,23 @@ export class PlayerStore {
         takeDamage: 0
     };
 
-    @observable public position: Vector2;
-    @observable public direction: Vector2;
+    @observable public position = new Vector2();
+    @observable public direction = new Vector2();
     @observable public health = this.MAX_HEALTH;
 
     constructor(
         position: Vector2,
         angle: number,
-        private applyInfiniteMovement: (position: Vector2, radius: number) => Vector2,
+        private applyInfiniteMovement: (position: Vector2) => Vector2,
         private createBullet: (bullet: IBaseBullet) => void
     ) {
-        this.position = applyInfiniteMovement(position, this.radius);
-        this.direction = Vector2.right.rotateNormalized(angle);
+        this.setPositionAndDirection(position, Vector2.right.rotateNormalized(angle));
+    }
+
+    @action
+    private setPositionAndDirection(position: Vector2, direction: Vector2) {
+        this.position = position;
+        this.direction = direction;
     }
 
     public updateActions = (data: Partial<IActions>) => {
@@ -104,7 +109,7 @@ export class PlayerStore {
 
         if (length > 0) {
             this.velocity.length = this.decreaseLengthBy(length, this.FRICTION);
-            this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)), this.radius);
+            this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)));
         }
     }
 
