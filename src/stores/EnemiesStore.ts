@@ -1,7 +1,7 @@
 import { EnemyStore } from "./EnemyStore";
 import { Vector2 } from "models";
 import { Helpers } from "helpers";
-import { IBaseBullet } from "interfaces";
+import { IBaseBullet, INeuralNet, INeuralNetConfig } from "interfaces";
 
 export class EnemiesStore {
 
@@ -9,16 +9,22 @@ export class EnemiesStore {
     public data: EnemyStore[];
 
     constructor(
+        maxDistanceToTheFood: number,
         getRandomPosition: () => Vector2,
+        getFoodPosition: () => Vector2,
         applyInfiniteMovement: (position: Vector2) => Vector2,
-        createBullet: (bullet: IBaseBullet) => void
+        createBullet: (bullet: IBaseBullet) => void,
+        createNeuralNet: (config: INeuralNetConfig) => INeuralNet
     ) {
         this.data = Helpers.range(this.COUNT).map(() => {
             return new EnemyStore(
+                maxDistanceToTheFood,
                 getRandomPosition(),
                 Helpers.random(0, Math.PI * 2),
                 applyInfiniteMovement,
-                createBullet
+                createBullet,
+                createNeuralNet,
+                getFoodPosition
             );
         });
     }

@@ -100,6 +100,10 @@ export class Vector2 {
         return this.divScalar(this.length);
     }
 
+    public angle(): number {
+        return (this.y > 0 ? 1 : -1) * Math.acos(this.x);
+    }
+
     public rotate(deg: number) {
         const len = this.length;
         if (len === 0) {
@@ -112,7 +116,7 @@ export class Vector2 {
     }
 
     public rotateNormalized(deg: number) {
-        const angle = (this.y > 0 ? 1 : -1) * Math.acos(this.x) + deg;
+        const angle = this.angle() + deg;
         this.x = Math.cos(angle);
         this.y = Math.sin(angle);
         return this;

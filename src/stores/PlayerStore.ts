@@ -56,6 +56,14 @@ export class PlayerStore {
         this.direction = direction;
     }
 
+    private decreaseLengthBy(length: number, delta: number): number {
+        return length > delta ? length - delta : 0;
+    }
+
+    private increaseHealthBy(length: number, delta: number): number {
+        return length + delta < this.MAX_HEALTH ? length + delta : this.MAX_HEALTH;
+    }
+
     public updateActions = (data: Partial<IActions>) => {
         this.actions = { ...this.actions, ...data };
     }
@@ -111,14 +119,6 @@ export class PlayerStore {
             this.velocity.length = this.decreaseLengthBy(length, this.FRICTION);
             this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)));
         }
-    }
-
-    private decreaseLengthBy(length: number, delta: number): number {
-        return length > delta ? length - delta : 0;
-    }
-
-    private increaseHealthBy(length: number, delta: number): number {
-        return length + delta < this.MAX_HEALTH ? length + delta : this.MAX_HEALTH;
     }
 
     public inArea(position: Vector2, radius: number): boolean {

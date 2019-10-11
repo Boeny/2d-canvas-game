@@ -1,5 +1,5 @@
 import { PlayerStore, EnemiesStore, BulletStore, FoodStore } from "stores";
-import { ICollider, IBullet } from "interfaces";
+import { ICollider, IBullet, INeuralNet, INeuralNetConfig } from "interfaces";
 import { Vector2 } from "./Vector2";
 import { VectorHelpers } from "helpers/VectorHelpers";
 
@@ -22,12 +22,27 @@ export class CompositionRoot {
         );
 
         this.enemiesStore = new EnemiesStore(
+            this.getMaxDistanceToTheFood(),
             this.getRandomPosition,
+            () => this.foodStore.position,
             this.applyInfiniteMovement,
-            this.bulletStore.createBullet
+            this.bulletStore.createBullet,
+            this.createNeuralNet
         );
 
         this.foodStore = new FoodStore(this.getRandomPosition());
+    }
+
+    private getMaxDistanceToTheFood(): number {
+        return new Vector2(this.width / 2, this.height / 2).length;
+    }
+
+    private createNeuralNet = (config: INeuralNetConfig): INeuralNet => {
+        return new NeuralNet(config); // TODO: implement NeuralNet class
+    }
+
+    private getRandomPosition = (): Vector2 => {
+        return VectorHelpers.random(this.width, this.height);
     }
 
     public setSize(width: number, height: number) {
@@ -52,14 +67,6 @@ export class CompositionRoot {
             position.y -= this.height;
         }
         return position;
-    }
-
-    private getRandomPosition = (): Vector2 => {
-        return VectorHelpers.random(this.width, this.height);
-    }
-
-    private getPlayers = (): PlayerStore[] => {
-        return this.enemiesStore.data.concat(this.playerStore);
     }
 
     public onCollidePlayer = (bullet: IBullet): PlayerStore | undefined => {
