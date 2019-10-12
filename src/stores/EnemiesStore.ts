@@ -14,7 +14,8 @@ export class EnemiesStore {
         getFoodPosition: () => Vector2,
         applyInfiniteMovement: (position: Vector2) => Vector2,
         createBullet: (bullet: IBaseBullet) => void,
-        createNeuralNet: (config: INeuralNetConfig) => INeuralNet
+        createNeuralNet: (config: INeuralNetConfig) => INeuralNet,
+        getIntersectionVector: (v: Vector2) => Vector2
     ) {
         this.data = Helpers.range(this.COUNT).map(() => {
             return new EnemyStore(
@@ -24,7 +25,8 @@ export class EnemiesStore {
                 applyInfiniteMovement,
                 createBullet,
                 createNeuralNet,
-                getFoodPosition
+                getFoodPosition,
+                getIntersectionVector
             );
         });
     }

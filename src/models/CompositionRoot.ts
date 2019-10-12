@@ -3,14 +3,61 @@ import { ICollider, IBullet, INeuralNet, INeuralNetConfig } from "interfaces";
 import { Vector2 } from "./Vector2";
 import { VectorHelpers } from "helpers/VectorHelpers";
 
+ // TODO: implement
+class NeuralNet implements INeuralNet {
+
+    public output: number[] = [];
+
+    constructor(config: INeuralNetConfig) {}
+
+    run(input: number[]) {
+
+    }
+}
+
+class Line2 {
+
+    public static fromVector(v: Vector2): Line2 {
+        return new Line2(0, 0, v.x, v.y);
+    }
+
+    constructor(public x1: number, public y1: number, public x2: number, public y2: number) {}
+}
+
+class LineSegment {
+
+    constructor(public x1: number, public y1: number, public x2: number, public y2: number) {}
+
+    intersection(line: Line2): Vector2 | null {
+        return new Vector2();
+    }
+}
+
+interface IBorders {
+    horizontal: LineSegment[];
+    vertical: LineSegment[];
+}
+
 export class CompositionRoot {
 
     public bulletStore: BulletStore;
     public playerStore: PlayerStore;
     public enemiesStore: EnemiesStore;
     public foodStore: FoodStore;
+    public borders: IBorders;
 
     constructor(private width: number, private height: number) {
+
+        this.borders = {
+            horizontal: [
+                new LineSegment(0, 0, this.width, 0),
+                new LineSegment(0, this.height, this.width, this.height)
+            ],
+            vertical: [
+                new LineSegment(0, 0, 0, this.height),
+                new LineSegment(this.width, 0, this.width, this.height)
+            ]
+        };
 
         this.bulletStore = new BulletStore(this.applyInfiniteMovement);
 
@@ -27,7 +74,8 @@ export class CompositionRoot {
             () => this.foodStore.position,
             this.applyInfiniteMovement,
             this.bulletStore.createBullet,
-            this.createNeuralNet
+            this.createNeuralNet,
+            this.getIntersectionVector
         );
 
         this.foodStore = new FoodStore(this.getRandomPosition());
@@ -37,12 +85,24 @@ export class CompositionRoot {
         return new Vector2(this.width / 2, this.height / 2).length;
     }
 
-    private createNeuralNet = (config: INeuralNetConfig): INeuralNet => {
-        return new NeuralNet(config); // TODO: implement NeuralNet class
-    }
-
     private getRandomPosition = (): Vector2 => {
         return VectorHelpers.random(this.width, this.height);
+    }
+
+    private createNeuralNet = (config: INeuralNetConfig): INeuralNet => {
+        return new NeuralNet(config);
+    }
+
+    private getIntersectionVector = (v: Vector2): Vector2 => {
+        const line = Line2.fromVector(v);
+
+        const { horizontal, vertical } = this.borders;
+        const horizontalIntersection = horizontal[0].intersection(line);
+
+        if (horizontalIntersection) {
+            return horizontalIntersection.sub(horizontal[1].intersection(line)!);
+        }
+        return vertical[0].intersection(line)!.sub(vertical[1].intersection(line)!);
     }
 
     public setSize(width: number, height: number) {

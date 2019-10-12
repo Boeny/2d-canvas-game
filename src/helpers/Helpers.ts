@@ -42,4 +42,8 @@ export abstract class Helpers {
     public static lerp(min: number, max: number, minValue: number, maxValue: number, value: number): number {
         return value * (max - min) / (maxValue - minValue);
     }
+
+    public static getOppositeAngle(angle: number): number {
+        return angle + Math.PI;
+    }
 }

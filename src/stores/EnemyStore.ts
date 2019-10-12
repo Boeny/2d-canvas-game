@@ -1,6 +1,7 @@
 import { PlayerStore, IActions } from "./PlayerStore";
 import { Vector2 } from "models";
 import { IBaseBullet, INeuralNet, INeuralNetConfig } from "interfaces";
+import { Helpers } from "helpers";
 
 export class EnemyStore extends PlayerStore {
 
@@ -15,7 +16,8 @@ export class EnemyStore extends PlayerStore {
         applyInfiniteMovement: (position: Vector2) => Vector2,
         createBullet: (bullet: IBaseBullet) => void,
         createNeuralNet: (config: INeuralNetConfig) => INeuralNet,
-        private getFoodPosition: () => Vector2
+        private getFoodPosition: () => Vector2,
+        private getIntersectionVector: (v: Vector2) => Vector2
     ) {
         super(position, angle, applyInfiniteMovement, createBullet);
         this.oldDistanceToTheFood = this.position.distance(this.getFoodPosition());
@@ -27,26 +29,44 @@ export class EnemyStore extends PlayerStore {
         });
     }
 
+    private getMinFoodVectorAngleAndLength(position: Vector2, foodPosition: Vector2): [number, number] {
+        const vectorToTheFood = position.clone().sub(foodPosition);
+        const distanceToTheFood = vectorToTheFood.length;
+
+        const foodVectorAngle = vectorToTheFood.angle();
+        const intersectionVector = this.getIntersectionVector(vectorToTheFood);
+        const oppositeLength = intersectionVector.length - distanceToTheFood;
+
+        return distanceToTheFood < oppositeLength ? [foodVectorAngle, distanceToTheFood] : [Helpers.getOppositeAngle(foodVectorAngle), oppositeLength];
+    }
+
     /**
      * returns number between [0, 1]
      * @param value number between [min, max]
      * @param min -> 0
      * @param max -> 1
      */
-    private normalizeNeuralInput(value: number, min: number, max: number): number {
+    private normalizeNeuralInput(value: number, min: number = 0, max: number = 1): number {
         return (value - min) / (max - min);
     }
 
-    private getNeuralInput(distanceToTheFood: number, foodVectorAngle: number): number[] {
+    private getNeuralInput(
+        distanceToTheFood: number,
+        maxDistanceToTheFood: number,
+        angle: number,
+        foodVectorAngle: number,
+        healthIncreased: boolean,
+        distanceDecreased: boolean
+    ): number[] {
         return [
             // distance to the food, [far, near]
-            this.normalizeNeuralInput(this.maxDistanceToTheFood - distanceToTheFood, 0, this.maxDistanceToTheFood),
+            this.normalizeNeuralInput(maxDistanceToTheFood - distanceToTheFood, 0, maxDistanceToTheFood),
             // angle between direction and foodVector [PI, 0]
-            this.normalizeNeuralInput(Math.PI - Math.abs(this.direction.angle() - foodVectorAngle), 0, Math.PI),
+            this.normalizeNeuralInput(Math.abs(Math.cos(angle - foodVectorAngle))),
             // if health was increased [not increased, increased]
-            this.normalizeNeuralInput(this.health > this.oldHealth ? 1 : 0, 0, 1),
+            this.normalizeNeuralInput(healthIncreased ? 1 : 0),
             // if distance to the food was descreased [not decreased, decreased]
-            this.normalizeNeuralInput(distanceToTheFood > this.oldDistanceToTheFood ? 1 : 0, 0, 1)
+            this.normalizeNeuralInput(distanceDecreased ? 1 : 0)
         ];
     }
 
@@ -54,9 +74,9 @@ export class EnemyStore extends PlayerStore {
         return v < 0.5;
     }
 
-    private mappingNeuralOutput(outputValues: number[]): IActions {
+    private mappingNeuralOutput(actions: IActions, outputValues: number[]): IActions {
         return {
-            ...this.actions,
+            ...actions,
             up: this.mappingNeuralOutputValue(outputValues[0]),
             down: this.mappingNeuralOutputValue(outputValues[1]),
             left: this.mappingNeuralOutputValue(outputValues[2]),
@@ -64,22 +84,21 @@ export class EnemyStore extends PlayerStore {
         };
     }
 
-    private getMinFoodVectorWithLength(): [Vector2, number] {
-        const v1 = this.position.clone().sub(this.getFoodPosition());
-        const len1 = v1.length;
-        const v2 = ; // TODO: find opposite vector
-        const len2 = v2.length;
-        return len1 < len2 ? [v1, len1] : [v2, len2];
-    }
-
     public onUpdate = (deltaTimeSec: number, food: number) => {
-        const [foodVector, distanceToTheFood] = this.getMinFoodVectorWithLength();
+        const [foodVectorAngle, distanceToTheFood] = this.getMinFoodVectorAngleAndLength(this.position, this.getFoodPosition());
 
-        this.neuralNet.run(this.getNeuralInput(distanceToTheFood, foodVector.angle()));
+        this.neuralNet.run(this.getNeuralInput(
+            distanceToTheFood,
+            this.maxDistanceToTheFood,
+            this.direction.angle(),
+            foodVectorAngle,
+            this.health > this.oldHealth,
+            distanceToTheFood > this.oldDistanceToTheFood
+        ));
         this.oldHealth = this.health;
         this.oldDistanceToTheFood = distanceToTheFood;
 
-        this.actions = this.mappingNeuralOutput(this.neuralNet.output);
+        this.actions = this.mappingNeuralOutput(this.actions, this.neuralNet.output);
         super.onUpdate(deltaTimeSec, food);
     }
 }
