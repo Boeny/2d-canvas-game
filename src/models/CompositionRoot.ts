@@ -1,41 +1,13 @@
 import { PlayerStore, EnemiesStore, BulletStore, FoodStore } from "stores";
 import { ICollider, IBullet, INeuralNet, INeuralNetConfig } from "interfaces";
-import { Vector2 } from "./Vector2";
 import { VectorHelpers } from "helpers/VectorHelpers";
-
- // TODO: implement
-class NeuralNet implements INeuralNet {
-
-    public output: number[] = [];
-
-    constructor(config: INeuralNetConfig) {}
-
-    run(input: number[]) {
-
-    }
-}
-
-class Line2 {
-
-    public static fromVector(v: Vector2): Line2 {
-        return new Line2(0, 0, v.x, v.y);
-    }
-
-    constructor(public x1: number, public y1: number, public x2: number, public y2: number) {}
-}
-
-class LineSegment {
-
-    constructor(public x1: number, public y1: number, public x2: number, public y2: number) {}
-
-    intersection(line: Line2): Vector2 | null {
-        return new Vector2();
-    }
-}
+import { Vector2 } from "./Vector2";
+import { Line2 } from "./Line2";
+import { NeuralNet } from "./NeuralNet";
 
 interface IBorders {
-    horizontal: LineSegment[];
-    vertical: LineSegment[];
+    horizontal: Line2[];
+    vertical: Line2[];
 }
 
 export class CompositionRoot {
@@ -50,12 +22,12 @@ export class CompositionRoot {
 
         this.borders = {
             horizontal: [
-                new LineSegment(0, 0, this.width, 0),
-                new LineSegment(0, this.height, this.width, this.height)
+                new Line2(0, 0, this.width, 0),
+                new Line2(0, this.height, this.width, this.height)
             ],
             vertical: [
-                new LineSegment(0, 0, 0, this.height),
-                new LineSegment(this.width, 0, this.width, this.height)
+                new Line2(0, 0, 0, this.height),
+                new Line2(this.width, 0, this.width, this.height)
             ]
         };
 
@@ -93,16 +65,29 @@ export class CompositionRoot {
         return new NeuralNet(config);
     }
 
+    private pointInScreenRange(p: Vector2): boolean {
+        return p.x >= 0 && p.x <= this.width && p.y >= 0 && p.y <= this.height;
+    }
+
     private getIntersectionVector = (v: Vector2): Vector2 => {
         const line = Line2.fromVector(v);
-
         const { horizontal, vertical } = this.borders;
-        const horizontalIntersection = horizontal[0].intersection(line);
 
-        if (horizontalIntersection) {
-            return horizontalIntersection.sub(horizontal[1].intersection(line)!);
+        const hor1 = horizontal[0].intersection(line);
+        const hor2 = horizontal[1].intersection(line);
+
+        if (hor1 && hor2 && this.pointInScreenRange(hor1) && this.pointInScreenRange(hor2)) {
+            return hor1.sub(hor2);
         }
-        return vertical[0].intersection(line)!.sub(vertical[1].intersection(line)!);
+
+        const vert1 = vertical[0].intersection(line);
+        const vert2 = vertical[1].intersection(line);
+
+        if (vert1 && vert2 && this.pointInScreenRange(vert1) && this.pointInScreenRange(vert2)) {
+            return vert1.sub(vert2);
+        }
+
+        return (vert1 && this.pointInScreenRange(vert1) ? vert1 : vert2!).sub(hor1 && this.pointInScreenRange(hor1) ? hor1 : hor2!);
     }
 
     public setSize(width: number, height: number) {

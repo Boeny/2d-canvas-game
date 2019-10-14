@@ -20,7 +20,8 @@ export class EnemyStore extends PlayerStore {
         private getIntersectionVector: (v: Vector2) => Vector2
     ) {
         super(position, angle, applyInfiniteMovement, createBullet);
-        this.oldDistanceToTheFood = this.position.distance(this.getFoodPosition());
+
+        this.oldDistanceToTheFood = maxDistanceToTheFood;
         this.neuralNet = createNeuralNet({
             inputAxonCount: 4,
             outputAxonCount: 4,

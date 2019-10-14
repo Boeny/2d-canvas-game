@@ -18,6 +18,7 @@ export class EnemiesStore {
         getIntersectionVector: (v: Vector2) => Vector2
     ) {
         this.data = Helpers.range(this.COUNT).map(() => {
+
             return new EnemyStore(
                 maxDistanceToTheFood,
                 getRandomPosition(),
