@@ -2,8 +2,8 @@ import { Vector2 } from "./Vector2";
 
 export class Line2 {
 
-    protected k: number | null;
-    protected b: number;
+    public k: number | null;
+    public b: number;
 
     public static fromVector(v: Vector2): Line2 {
         return new Line2(0, 0, v.x, v.y);
@@ -30,7 +30,14 @@ export class Line2 {
         if (this.k === 0 && line.k) {
             return new Vector2(line.getX(this.b)!, this.b);
         }
+        if (line.k === null || this.k === null) {
+            return null;
+        }
         const y = (line.k * this.b / this.k - line.b) / (line.k / this.k - 1);
-        return new Vector2(this.getX(y), y);
+        const x = this.getX(y);
+        if (x === null) {
+            return null;
+        }
+        return new Vector2(x, y);
     }
 }

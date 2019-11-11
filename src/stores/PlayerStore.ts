@@ -69,7 +69,7 @@ export class PlayerStore {
     }
 
     @action
-    public onUpdate = (deltaTimeSec: number, food: number) => {
+    private updateAction(deltaTimeSec: number, food: number) {
 
         // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_LIFE * deltaTimeSec);
 
@@ -119,6 +119,10 @@ export class PlayerStore {
             this.velocity.length = this.decreaseLengthBy(length, this.FRICTION);
             this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)));
         }
+    }
+
+    public onUpdate(deltaTimeSec: number, food: number) {
+        this.updateAction(deltaTimeSec, food);
     }
 
     public inArea(position: Vector2, radius: number): boolean {

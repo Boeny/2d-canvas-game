@@ -85,7 +85,7 @@ export class EnemyStore extends PlayerStore {
         };
     }
 
-    public onUpdate = (deltaTimeSec: number, food: number) => {
+    public onUpdate(deltaTimeSec: number, food: number) {
         const [foodVectorAngle, distanceToTheFood] = this.getMinFoodVectorAngleAndLength(this.position, this.getFoodPosition());
 
         this.neuralNet.run(this.getNeuralInput(
