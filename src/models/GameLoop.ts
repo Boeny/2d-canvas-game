@@ -1,5 +1,6 @@
 import { runInAction } from "mobx";
 import { IGameObjectComponent } from "components/GameObjectComponent";
+import { menuStore } from "stores";
 
 class GameLoop {
 
@@ -12,6 +13,10 @@ class GameLoop {
 
         const deltaTimeSec = Math.min(100, time - this.prevTime) / 1000;
         this.prevTime = time;
+
+        if (menuStore.visible) {
+            return;
+        }
 
         runInAction(() => this.gameObjects.forEach(o => o.onGameLoop(deltaTimeSec)));
     }

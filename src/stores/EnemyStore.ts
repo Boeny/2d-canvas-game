@@ -1,7 +1,6 @@
 import { PlayerStore, IActions } from "./PlayerStore";
 import { Vector2 } from "models";
 import { IBaseBullet, INeuralNet, INeuralNetConfig } from "interfaces";
-import { Helpers } from "helpers";
 
 export class EnemyStore extends PlayerStore {
 
@@ -13,13 +12,11 @@ export class EnemyStore extends PlayerStore {
         private maxDistanceToTheFood: number,
         position: Vector2,
         angle: number,
-        applyInfiniteMovement: (position: Vector2) => Vector2,
         createBullet: (bullet: IBaseBullet) => void,
         createNeuralNet: (config: INeuralNetConfig) => INeuralNet,
-        private getFoodPosition: () => Vector2,
-        private getIntersectionVector: (v: Vector2) => Vector2
+        private getFoodPosition: () => Vector2
     ) {
-        super(position, angle, applyInfiniteMovement, createBullet);
+        super(position, angle, createBullet);
 
         this.oldDistanceToTheFood = maxDistanceToTheFood;
         this.neuralNet = createNeuralNet({
@@ -33,12 +30,9 @@ export class EnemyStore extends PlayerStore {
     private getMinFoodVectorAngleAndLength(position: Vector2, foodPosition: Vector2): [number, number] {
         const vectorToTheFood = position.clone().sub(foodPosition);
         const distanceToTheFood = vectorToTheFood.length;
-
         const foodVectorAngle = vectorToTheFood.angle();
-        const intersectionVector = this.getIntersectionVector(vectorToTheFood);
-        const oppositeLength = intersectionVector.length - distanceToTheFood;
 
-        return distanceToTheFood < oppositeLength ? [foodVectorAngle, distanceToTheFood] : [Helpers.getOppositeAngle(foodVectorAngle), oppositeLength];
+        return [foodVectorAngle, distanceToTheFood];
     }
 
     /**
@@ -85,7 +79,7 @@ export class EnemyStore extends PlayerStore {
         };
     }
 
-    public onUpdate(deltaTimeSec: number, food: number) {
+    public onUpdate(deltaTimeSec: number) {
         const [foodVectorAngle, distanceToTheFood] = this.getMinFoodVectorAngleAndLength(this.position, this.getFoodPosition());
 
         this.neuralNet.run(this.getNeuralInput(
@@ -100,6 +94,6 @@ export class EnemyStore extends PlayerStore {
         this.oldDistanceToTheFood = distanceToTheFood;
 
         this.actions = this.mappingNeuralOutput(this.actions, this.neuralNet.output);
-        super.onUpdate(deltaTimeSec, food);
+        super.onUpdate(deltaTimeSec);
     }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { Vector2 } from "models";
-import { Rect } from "components";
+import { Rect } from "./Rect";
 import { Line } from "react-konva";
 
 interface IProps {

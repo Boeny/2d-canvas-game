@@ -12,10 +12,8 @@ export class EnemiesStore {
         maxDistanceToTheFood: number,
         getRandomPosition: () => Vector2,
         getFoodPosition: () => Vector2,
-        applyInfiniteMovement: (position: Vector2) => Vector2,
         createBullet: (bullet: IBaseBullet) => void,
-        createNeuralNet: (config: INeuralNetConfig) => INeuralNet,
-        getIntersectionVector: (v: Vector2) => Vector2
+        createNeuralNet: (config: INeuralNetConfig) => INeuralNet
     ) {
         this.data = Helpers.range(this.COUNT).map(() => {
 
@@ -23,11 +21,9 @@ export class EnemiesStore {
                 maxDistanceToTheFood,
                 getRandomPosition(),
                 Helpers.random(0, Math.PI * 2),
-                applyInfiniteMovement,
                 createBullet,
                 createNeuralNet,
-                getFoodPosition,
-                getIntersectionVector
+                getFoodPosition
             );
         });
     }

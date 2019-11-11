@@ -23,7 +23,7 @@ export class Enemies extends React.PureComponent<IProps> {
                                 scale={store.radius}
                                 position={store.position}
                                 direction={store.direction}
-                                onUpdate={delta => store.onUpdate(delta, this.props.onCollideFood(store))}
+                                onUpdate={delta => store.onUpdate(delta)}
                             />
                         }
                     />

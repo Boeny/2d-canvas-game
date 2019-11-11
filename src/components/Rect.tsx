@@ -15,7 +15,7 @@ export function Rect(props: IProps) {
     return (
         <KRect
             {...props}
-            strke={props.color}
+            stroke={props.color}
             fill={props.color}
             x={props.position.x}
             y={props.position.y}

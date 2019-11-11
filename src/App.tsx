@@ -2,9 +2,11 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import Konva from "konva";
 import { observer } from "mobx-react";
-import { ContainerStore } from "stores/ContainerStore";
+import { menuStore, ContainerStore } from "stores";
 import { activeObject, gameLoop } from "models";
 import { Scene } from "Scene";
+import { Menu } from "Menu";
+import { KeysType } from "enums/KeysType";
 
 @observer
 export class App extends React.PureComponent {
@@ -26,14 +28,14 @@ export class App extends React.PureComponent {
         container.addEventListener("keydown", e => {
             e.preventDefault();
             activeObject.instance && activeObject.instance.onKeyDown(e);
+
+            if (e.keyCode === KeysType.esc) {
+                this.onEscapePressed(container);
+            }
         });
         container.addEventListener("keyup", e => {
             e.preventDefault();
             activeObject.instance && activeObject.instance.onKeyUp(e);
-        });
-        container.addEventListener("keypress", e => {
-            e.preventDefault();
-            activeObject.instance && activeObject.instance.onKeyPress(e);
         });
         window.addEventListener("resize", this.reSize);
 
@@ -45,6 +47,15 @@ export class App extends React.PureComponent {
         this.containerStore.setSize(window.innerWidth, window.innerHeight);
     }
 
+    private onEscapePressed(container: HTMLDivElement) {
+        const visible = !menuStore.visible;
+        menuStore.setVisibility(visible);
+
+        if (!visible) {
+            container.focus();
+        }
+    }
+
     render() {
         // Stage is a div container
         // Layer is actual canvas element (so you may have several canvases in the stage)
@@ -52,23 +63,26 @@ export class App extends React.PureComponent {
         const { width, height } = this.containerStore;
 
         return (
-            <Stage
-                width={width}
-                height={height}
-                ref={el => this.stage = el ? el.getStage() : null}
-                tabIndex={1}
-            >
-                <Layer>
-                    {
-                        width > 0 ?
-                            <Scene
-                                width={width}
-                                height={height}
-                            />
-                            : null
-                    }
-                </Layer>
-            </Stage>
+            <>
+                <Menu />
+                <Stage
+                    width={width}
+                    height={height}
+                    ref={el => this.stage = el ? el.getStage() : null}
+                    tabIndex={1}
+                >
+                    <Layer>
+                        {
+                            width > 0 ?
+                                <Scene
+                                    width={width}
+                                    height={height}
+                                />
+                                : null
+                        }
+                    </Layer>
+                </Stage>
+            </>
         );
     }
 }

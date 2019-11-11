@@ -1,5 +1,4 @@
 import { observable, action } from "mobx";
-import { Vector2 } from "models";
 import { IBaseBullet, IBullet } from "interfaces";
 
 export class BulletStore {
@@ -13,10 +12,6 @@ export class BulletStore {
 
     @observable
     public bullets: IBullet[] = [];
-
-    constructor(
-        private applyInfiniteMovement: (position: Vector2, radius: number) => Vector2
-    ) {}
 
     @action
     public createBullet = (o: IBaseBullet) => {
@@ -39,7 +34,7 @@ export class BulletStore {
             this.remove(bullet.id);
             return;
         }
-        bullet.position = this.applyInfiniteMovement(bullet.position.clone().add(bullet.velocity.clone().multScalar(deltaTimeSec)), this.SCALE);
+        bullet.position = bullet.position.clone().add(bullet.velocity.clone().multScalar(deltaTimeSec));
     }
 
     @action

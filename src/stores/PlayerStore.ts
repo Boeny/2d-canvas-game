@@ -1,4 +1,4 @@
-import { observable, action } from "mobx";
+import { observable, action, runInAction } from "mobx";
 import { Vector2 } from "models";
 import { VectorHelpers } from "helpers/VectorHelpers";
 import { IBaseBullet } from "interfaces";
@@ -14,10 +14,10 @@ export interface IActions {
 
 export class PlayerStore {
 
-    public radius = 20;
+    public radius = 5;
     private ACCELERATION = 10;
     private MAX_ROTATION_SPEED = 10;
-    private FRICTION = 2;
+    private FRICTION = 0;
     private RECHARGING_TIME = 0.2;
     private BULLET_RECOIL = 30;
     public MAX_HEALTH = 100;
@@ -44,7 +44,6 @@ export class PlayerStore {
     constructor(
         position: Vector2,
         angle: number,
-        private applyInfiniteMovement: (position: Vector2) => Vector2,
         private createBullet: (bullet: IBaseBullet) => void
     ) {
         this.setPositionAndDirection(position, Vector2.right.rotateNormalized(angle));
@@ -69,16 +68,13 @@ export class PlayerStore {
     }
 
     @action
-    private updateAction(deltaTimeSec: number, food: number) {
+    private updateAction(deltaTimeSec: number) {
 
         // this.health = this.decreaseLengthBy(this.health, this.ENERGY_FOR_LIFE * deltaTimeSec);
 
         if (this.actions.takeDamage > 0) {
             this.health = this.decreaseLengthBy(this.health, this.actions.takeDamage);
             this.actions.takeDamage = 0;
-        }
-        if (food > 0) {
-            this.health = this.increaseHealthBy(this.health, food);
         }
 
         if (this.actions.left) {
@@ -117,12 +113,18 @@ export class PlayerStore {
 
         if (length > 0) {
             this.velocity.length = this.decreaseLengthBy(length, this.FRICTION);
-            this.position = this.applyInfiniteMovement(this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec)));
+            this.position = this.position.clone().add(this.velocity.clone().multScalar(deltaTimeSec));
         }
     }
 
-    public onUpdate(deltaTimeSec: number, food: number) {
-        this.updateAction(deltaTimeSec, food);
+    public onUpdate(deltaTimeSec: number) {
+        this.updateAction(deltaTimeSec);
+    }
+
+    public onCollide(food: number) {
+        if (food > 0) {
+            runInAction(() => this.health = this.increaseHealthBy(this.health, food));
+        }
     }
 
     public inArea(position: Vector2, radius: number): boolean {
