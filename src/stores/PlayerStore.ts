@@ -46,13 +46,13 @@ export class PlayerStore {
         angle: number,
         private createBullet: (bullet: IBaseBullet) => void
     ) {
-        this.setPositionAndDirection(position, Vector2.right.rotateNormalized(angle));
+        this.setPositionAndDirection(position, angle);
     }
 
     @action
-    private setPositionAndDirection(position: Vector2, direction: Vector2) {
+    public setPositionAndDirection(position: Vector2, angle: number) {
         this.position = position;
-        this.direction = direction;
+        this.direction = Vector2.right.rotateNormalized(angle);
     }
 
     private decreaseLengthBy(length: number, delta: number): number {

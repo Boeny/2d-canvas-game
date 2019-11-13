@@ -4,13 +4,7 @@ import { menuStore } from "stores";
 import { MenuMode } from "enums/MenuMode";
 import { observer } from "mobx-react";
 
-interface IComponentProps {
-    onContinue: () => void;
-    onNew: () => void;
-    onEdit: () => void;
-}
-
-export function MenuComponent(props: IComponentProps) {
+export function MenuComponent(props: IProps) {
     return (
         <div className="menu">
             <button onClick={props.onContinue}>Continue</button>
@@ -20,8 +14,14 @@ export function MenuComponent(props: IComponentProps) {
     );
 }
 
+interface IProps {
+    onContinue: () => void;
+    onNew: () => void;
+    onEdit: () => void;
+}
+
 @observer
-export class Menu extends React.Component {
+export class Menu extends React.PureComponent<IProps> {
 
     render() {
 
@@ -30,9 +30,18 @@ export class Menu extends React.Component {
         }
         return (
             <MenuComponent
-                onContinue={() => menuStore.setMode(MenuMode.continue)}
-                onNew={() => menuStore.setMode(MenuMode.new)}
-                onEdit={() => menuStore.setMode(MenuMode.edit)}
+                onContinue={() => {
+                    menuStore.setMode(MenuMode.continue);
+                    this.props.onContinue();
+                }}
+                onNew={() => {
+                    menuStore.setMode(MenuMode.new);
+                    this.props.onNew();
+                }}
+                onEdit={() => {
+                    menuStore.setMode(MenuMode.edit);
+                    this.props.onEdit();
+                }}
             />
         );
     }

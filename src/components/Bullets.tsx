@@ -4,13 +4,12 @@ import { BulletStore } from "stores/BulletStore";
 import { IBullet } from "interfaces";
 import { GameObjectComponent } from "components/GameObjectComponent";
 import { ScaledTriangle } from "./ScaledTriangle";
-import { PlayerStore } from "stores/PlayerStore";
 
 interface IBulletProps {
     scale: number;
     bullet: IBullet;
     move: (deltaTimeSec: number) => void;
-    onCollide: () => PlayerStore | undefined;
+    checkPlayerCollision: () => boolean;
     remove: () => void;
 }
 
@@ -18,8 +17,8 @@ interface IBulletProps {
 class Bullet extends GameObjectComponent<IBulletProps> {
 
     onGameLoop = (deltaTimeSec: number) => {
-        const collider = this.props.onCollide();
-        if (collider) {
+        const hasCollision = this.props.checkPlayerCollision();
+        if (hasCollision) {
             this.props.remove();
         }
         else {
@@ -44,7 +43,7 @@ class Bullet extends GameObjectComponent<IBulletProps> {
 
 interface IProps {
     store: BulletStore;
-    onCollide: (bullet: IBullet) => PlayerStore | undefined;
+    checkPlayerCollision: (bullet: IBullet) => boolean;
 }
 
 @observer
@@ -59,7 +58,7 @@ export class Bullets extends React.PureComponent<IProps> {
                         bullet={bullet}
                         scale={bullet.radius}
                         move={delta => this.props.store.move(bullet, delta)}
-                        onCollide={() => this.props.onCollide(bullet)}
+                        checkPlayerCollision={() => this.props.checkPlayerCollision(bullet)}
                         remove={() => this.props.store.remove(bullet.id)}
                     />
                 )}

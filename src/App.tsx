@@ -1,39 +1,38 @@
 import React from "react";
 import { Stage, Layer } from "react-konva";
-import Konva from "konva";
 import { observer } from "mobx-react";
-import { menuStore, ContainerStore } from "stores";
-import { activeObject, gameLoop } from "models";
-import { Scene } from "Scene";
-import { Menu } from "Menu";
-import { KeysType } from "enums/KeysType";
+import { menuStore } from "./stores";
+import { CompositionRoot } from "./models/CompositionRoot";
+import { activeObject, gameLoop } from "./models";
+import { KeysType } from "./enums/KeysType";
+import { Scenes } from "./Scenes";
+import { Menu } from "./Menu";
 
 @observer
 export class App extends React.PureComponent {
 
-    private stage: Konva.Stage | null = null;
-    private containerStore = new ContainerStore();
+    private container: HTMLDivElement | null = null;
+    private root = new CompositionRoot();
 
     componentDidMount() {
-        if (!this.stage) {
+        if (!this.container) {
             return;
         }
-        const container = this.stage.container();
-        container.focus();
+        this.focusContainer();
 
-        container.addEventListener("click", e => {
+        this.container.addEventListener("click", e => {
             e.preventDefault();
             activeObject.instance && activeObject.instance.onContainerClick(e);
         });
-        container.addEventListener("keydown", e => {
+        this.container.addEventListener("keydown", e => {
             e.preventDefault();
             activeObject.instance && activeObject.instance.onKeyDown(e);
 
             if (e.keyCode === KeysType.esc) {
-                this.onEscapePressed(container);
+                this.onEscapePressed();
             }
         });
-        container.addEventListener("keyup", e => {
+        this.container.addEventListener("keyup", e => {
             e.preventDefault();
             activeObject.instance && activeObject.instance.onKeyUp(e);
         });
@@ -43,41 +42,44 @@ export class App extends React.PureComponent {
         gameLoop.run();
     }
 
-    private reSize = () => {
-        this.containerStore.setSize(window.innerWidth, window.innerHeight);
+    private focusContainer = () => {
+        this.container && this.container.focus();
     }
 
-    private onEscapePressed(container: HTMLDivElement) {
-        const visible = !menuStore.visible;
-        menuStore.setVisibility(visible);
+    private reSize = () => {
+        this.root.containerStore.setSize(window.innerWidth, window.innerHeight);
+    }
 
-        if (!visible) {
-            container.focus();
-        }
+    private onEscapePressed() {
+        menuStore.setVisibility(!menuStore.visible);
     }
 
     render() {
         // Stage is a div container
         // Layer is actual canvas element (so you may have several canvases in the stage)
         // And then we have canvas shapes inside the Layer
-        const { width, height } = this.containerStore;
+        const { width, height } = this.root.containerStore;
 
         return (
             <>
-                <Menu />
+                <Menu
+                    onContinue={this.focusContainer}
+                    onNew={() => {
+                        this.focusContainer();
+                        this.root.init();
+                    }}
+                    onEdit={this.focusContainer}
+                />
                 <Stage
                     width={width}
                     height={height}
-                    ref={el => this.stage = el ? el.getStage() : null}
+                    ref={el => this.container = el ? el.getStage().container() : null}
                     tabIndex={1}
                 >
                     <Layer>
                         {
                             width > 0 ?
-                                <Scene
-                                    width={width}
-                                    height={height}
-                                />
+                                <Scenes root={this.root} />
                                 : null
                         }
                     </Layer>

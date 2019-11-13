@@ -4,30 +4,31 @@ import { menuStore } from "stores";
 
 class GameLoop {
 
-    gameObjects: IGameObjectComponent[] = [];
+    private gameObjects: IGameObjectComponent[] = [];
+    private prevTime = 0;
 
-    prevTime = 0;
+    constructor(private isOnMenuMode: () => boolean) {}
 
-    run = (time = 100) => {
+    public run = (time = 100) => {
         requestAnimationFrame(this.run);
 
         const deltaTimeSec = Math.min(100, time - this.prevTime) / 1000;
         this.prevTime = time;
 
-        if (menuStore.visible) {
+        if (this.isOnMenuMode()) {
             return;
         }
 
         runInAction(() => this.gameObjects.forEach(o => o.onGameLoop(deltaTimeSec)));
     }
 
-    addGameObject(gameObject: IGameObjectComponent) {
+    public addGameObject(gameObject: IGameObjectComponent) {
         this.gameObjects.push(gameObject);
     }
 
-    removeGameObject(gameObject: IGameObjectComponent) {
+    public removeGameObject(gameObject: IGameObjectComponent) {
         this.gameObjects.splice(this.gameObjects.indexOf(gameObject), 1);
     }
 }
 
-export const gameLoop = new GameLoop();
+export const gameLoop = new GameLoop(() => menuStore.visible);
