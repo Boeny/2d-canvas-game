@@ -2,11 +2,9 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import { observer } from "mobx-react";
 import { menuStore } from "./stores";
-import { CompositionRoot } from "./models/CompositionRoot";
-import { activeObject, gameLoop } from "./models";
+import { CompositionRoot, activeObject, gameLoop } from "./models";
 import { KeysType } from "./enums/KeysType";
-import { Scenes } from "./Scenes";
-import { Menu } from "./Menu";
+import { Content } from "Content";
 
 @observer
 export class App extends React.PureComponent {
@@ -23,6 +21,10 @@ export class App extends React.PureComponent {
         this.container.addEventListener("click", e => {
             e.preventDefault();
             activeObject.instance && activeObject.instance.onContainerClick(e);
+        });
+        this.container.addEventListener("mousemove", e => {
+            e.preventDefault();
+            activeObject.instance && activeObject.instance.onMouseMove(e);
         });
         this.container.addEventListener("keydown", e => {
             e.preventDefault();
@@ -61,30 +63,19 @@ export class App extends React.PureComponent {
         const { width, height } = this.root.containerStore;
 
         return (
-            <>
-                <Menu
-                    onContinue={this.focusContainer}
-                    onNew={() => {
-                        this.focusContainer();
-                        this.root.init();
-                    }}
-                    onEdit={this.focusContainer}
-                />
-                <Stage
-                    width={width}
-                    height={height}
-                    ref={el => this.container = el ? el.getStage().container() : null}
-                    tabIndex={1}
-                >
-                    <Layer>
-                        {
-                            width > 0 ?
-                                <Scenes root={this.root} />
-                                : null
-                        }
-                    </Layer>
-                </Stage>
-            </>
+            <Stage
+                width={width}
+                height={height}
+                ref={el => this.container = el ? el.getStage().container() : null}
+                tabIndex={1}
+            >
+                <Layer>
+                    {width > 0
+                        ? <Content root={this.root} />
+                        : null
+                    }
+                </Layer>
+            </Stage>
         );
     }
 }

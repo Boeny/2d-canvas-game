@@ -1,16 +1,12 @@
 .menu {
     position: fixed;
     z-index: 1;
-    top: 50%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    padding: 10px 5px;
-    max-width: 155px;
     text-align: center;
     border-radius: 5px;
-    background: rgba(255, 255, 255, 0.62);
 
     button {
+        display: block;
+        outline: none;
         width: 140px;
         line-height: 2;
         font-weight: bold;
@@ -24,6 +20,26 @@
         }
         &:active {
             background: #999;
+        }
+    }
+
+    &.main {
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        background: rgba(255, 255, 255, 0.62);
+        padding: 10px;
+    }
+
+    &.editorMenu {
+        background: none;
+        padding: 0;
+        top: 20px;
+        left: 30px;
+        transform: none;
+
+        button {
+            width: 266px;
         }
     }
 }

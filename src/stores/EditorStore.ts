@@ -1,6 +1,5 @@
 import { observable, action } from "mobx";
-import { Planet } from "models/Planet";
-import { Vector2 } from "models";
+import { Planet, Vector2 } from "models";
 
 export class EditorStore {
 

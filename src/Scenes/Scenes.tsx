@@ -1,6 +1,6 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { CompositionRoot } from "models/CompositionRoot";
+import { CompositionRoot } from "models";
 import { MenuMode } from "enums/MenuMode";
 import { menuStore } from "stores";
 import { WelcomeScene } from "./WelcomeScene";
@@ -25,7 +25,7 @@ export class Scenes extends React.PureComponent<IProps> {
             case MenuMode.new:
                 return <MainScene root={root} />;
             case MenuMode.edit:
-                return <EditorScene store={root.editorStore} />;
+                return <EditorScene editorStore={root.editorStore} containerStore={root.containerStore} />;
         }
     }
 }

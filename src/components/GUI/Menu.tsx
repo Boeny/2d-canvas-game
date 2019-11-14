@@ -4,10 +4,14 @@ import { menuStore } from "stores";
 import { MenuMode } from "enums/MenuMode";
 import { observer } from "mobx-react";
 
-export function MenuComponent(props: IProps) {
+function MenuComponent(props: IProps & { showContinue: boolean }) {
     return (
-        <div className="menu">
-            <button onClick={props.onContinue}>Continue</button>
+        <div className="menu main">
+            {
+                props.showContinue
+                    ? <button onClick={props.onContinue}>Continue</button>
+                    : null
+            }
             <button onClick={props.onNew}>New project</button>
             <button onClick={props.onEdit}>Editor</button>
         </div>
@@ -15,9 +19,9 @@ export function MenuComponent(props: IProps) {
 }
 
 interface IProps {
-    onContinue: () => void;
     onNew: () => void;
-    onEdit: () => void;
+    onContinue?: () => void;
+    onEdit?: () => void;
 }
 
 @observer
@@ -26,13 +30,14 @@ export class Menu extends React.PureComponent<IProps> {
     render() {
 
         if (!menuStore.visible) {
-            return null;
+            return <noscript />;
         }
         return (
             <MenuComponent
+                showContinue={menuStore.mode !== MenuMode.default}
                 onContinue={() => {
                     menuStore.setMode(MenuMode.continue);
-                    this.props.onContinue();
+                    this.props.onContinue && this.props.onContinue();
                 }}
                 onNew={() => {
                     menuStore.setMode(MenuMode.new);
@@ -40,7 +45,7 @@ export class Menu extends React.PureComponent<IProps> {
                 }}
                 onEdit={() => {
                     menuStore.setMode(MenuMode.edit);
-                    this.props.onEdit();
+                    this.props.onEdit && this.props.onEdit();
                 }}
             />
         );

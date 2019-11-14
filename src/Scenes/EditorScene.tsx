@@ -1,27 +1,30 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { EditorStore } from "stores";
+import { EditorStore, ContainerStore, menuStore } from "stores";
 import { Circle } from "components/Circle";
+import { GUI, Background, EditorMenu } from "components";
 
 interface IProps {
-    store: EditorStore;
+    containerStore: ContainerStore;
+    editorStore: EditorStore;
 }
 
 @observer
 export class EditorScene extends React.PureComponent<IProps> {
 
     render() {
-        const { store } = this.props;
+        const { editorStore, containerStore } = this.props;
         return (
             <>
-                {/* <GUI>
-                    <div>
-                        <button>Stars layer (place stars)</button>
-                        <button>Star system layer (place planets)</button>
-                        <button>Planet layer (place satellites)</button>
-                    </div>
-                </GUI> */}
-                {store.planets.map((p, i) => <Circle key={i} {...p} color="white" />)}
+                <GUI>
+                    <EditorMenu
+                        placeStar={() => {}}
+                        placePlanet={() => {}}
+                        placeSatellite={() => {}}
+                    />
+                </GUI>
+                <Background color="black" containerStore={containerStore} />
+                {editorStore.planets.map((p, i) => <Circle key={i} {...p} color="white" />)}
             </>
         );
     }

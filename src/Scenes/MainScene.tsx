@@ -1,6 +1,6 @@
 import React from "react";
 import { Player, Bullets, ObjectWithHealth, Background } from "components";
-import { CompositionRoot } from "models/CompositionRoot";
+import { CompositionRoot } from "models";
 import { IBullet } from "interfaces";
 
 interface IProps {

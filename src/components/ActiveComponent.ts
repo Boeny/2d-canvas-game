@@ -6,6 +6,7 @@ export interface IActiveComponent {
     onKeyUp: (e: KeyboardEvent) => void;
     onKeyPress: (e: KeyboardEvent) => void;
     onContainerClick: (e: MouseEvent) => void;
+    onMouseMove: (e: MouseEvent) => void;
 }
 
 export class ActiveComponent<P> extends GameObjectComponent<P> implements IActiveComponent {
@@ -14,6 +15,7 @@ export class ActiveComponent<P> extends GameObjectComponent<P> implements IActiv
     public onKeyUp = (e: KeyboardEvent) => {};
     public onKeyPress = (e: KeyboardEvent) => {};
     public onContainerClick = (e: MouseEvent) => {};
+    public onMouseMove = (e: MouseEvent) => {};
 
     componentDidMount() {
         super.componentDidMount();
