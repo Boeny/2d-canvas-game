@@ -2,10 +2,9 @@ import React from "react";
 import { Rect } from "./Rect";
 import { Vector2 } from "models";
 import { observer } from "mobx-react";
-import { ContainerStore } from "stores";
+import { containerStore } from "stores";
 
 interface IProps {
-    containerStore: ContainerStore;
     color: string;
 }
 
@@ -14,7 +13,7 @@ export class Background extends React.PureComponent<IProps> {
 
     public render() {
 
-        const { containerStore, color } = this.props;
+        const { color } = this.props;
 
         return (
             <Rect

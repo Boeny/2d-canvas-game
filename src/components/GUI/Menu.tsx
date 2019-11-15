@@ -1,52 +1,96 @@
 import "./Menu.scss";
 import React from "react";
 import { menuStore } from "stores";
-import { MenuMode } from "enums";
+import { Mode, KeysType } from "enums";
 import { observer } from "mobx-react";
 
-function MenuComponent(props: IProps & { showContinue: boolean }) {
-    return (
-        <div className="menu main">
-            {
-                props.showContinue
-                    ? <button onClick={props.onContinue}>Continue</button>
-                    : null
-            }
-            <button onClick={props.onNew}>New project</button>
-            <button onClick={props.onEdit}>Editor</button>
-        </div>
-    );
+interface IComponentProps {
+    mode: Mode;
+    showContinue: boolean;
+    onNew: () => void;
+    onContinue: () => void;
+    onEdit: () => void;
+    onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+}
+
+class MenuComponent extends React.PureComponent<IComponentProps> {
+
+    activeButton: HTMLButtonElement | null = null;
+
+    componentDidMount() {
+        this.activeButton && this.activeButton.focus();
+    }
+
+    setActiveButton = (condition: boolean) => (el: HTMLButtonElement | null) => {
+        if (condition) {
+            this.activeButton = el;
+        }
+    }
+
+    render() {
+
+        const { mode, showContinue, onNew, onContinue, onEdit, onKeyDown } = this.props;
+
+        return (
+            <div className="menu main" onKeyDown={onKeyDown}>
+                {
+                    showContinue
+                        ? (
+                            <button
+                                onClick={onContinue}
+                                ref={this.setActiveButton(mode === Mode.continue || mode === Mode.new)}
+                            >
+                                Continue
+                            </button>
+                        )
+                        : null
+                }
+                <button onClick={onNew}>New project</button>
+                <button onClick={onEdit} ref={this.setActiveButton(mode === Mode.edit)}>Editor</button>
+            </div>
+        );
+    }
 }
 
 interface IProps {
+    focusContainer: () => void;
     onNew: () => void;
-    onContinue?: () => void;
-    onEdit?: () => void;
 }
 
 @observer
 export class Menu extends React.PureComponent<IProps> {
 
+    close = (condition: boolean) => {
+        if (condition) {
+            menuStore.setVisibility(false);
+            this.props.focusContainer();
+        }
+    }
+
+    setMode = (mode: Mode) => {
+        menuStore.setMode(mode);
+        this.close(true);
+
+        if (mode === Mode.new) {
+            this.props.onNew();
+        }
+    }
+
     render() {
 
-        if (!menuStore.visible) {
+        const { mode, visible } = menuStore;
+
+        if (!visible) {
             return null;
         }
         return (
             <MenuComponent
-                showContinue={menuStore.mode !== MenuMode.default}
-                onContinue={() => {
-                    menuStore.setMode(MenuMode.continue);
-                    this.props.onContinue && this.props.onContinue();
-                }}
-                onNew={() => {
-                    menuStore.setMode(MenuMode.new);
-                    this.props.onNew();
-                }}
-                onEdit={() => {
-                    menuStore.setMode(MenuMode.edit);
-                    this.props.onEdit && this.props.onEdit();
-                }}
+                mode={mode}
+                onKeyDown={e => this.close(e.keyCode === KeysType.esc && mode !== Mode.default)}
+                showContinue={mode === Mode.new || mode === Mode.continue}
+                onContinue={() => this.setMode(Mode.continue)}
+                onNew={() => this.setMode(Mode.new)}
+                onEdit={() => this.setMode(Mode.edit)}
             />
         );
     }

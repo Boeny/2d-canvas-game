@@ -2,6 +2,7 @@ import React from "react";
 import { Player, Bullets, ObjectWithHealth, Background } from "components";
 import { CompositionRoot } from "models";
 import { IBullet } from "interfaces";
+import { Mode } from "enums";
 
 interface IProps {
     root: CompositionRoot;
@@ -20,12 +21,14 @@ export class MainScene extends React.PureComponent<IProps> {
     }
 
     render() {
-        const { root } = this.props;
+
+        const { playerStore, bulletStore } = this.props.root;
+
         return (
             <>
-                <Background color="black" containerStore={root.containerStore} />
+                <Background color="black" />
                 <ObjectWithHealth
-                    store={root.playerStore}
+                    store={playerStore}
                     component={store =>
                         <Player
                             scale={store.radius}
@@ -37,7 +40,7 @@ export class MainScene extends React.PureComponent<IProps> {
                     }
                 />
                 {/*<Enemies store={this.root.enemiesStore} onCollideFood={this.root.onCollideFood} />*/}
-                <Bullets store={root.bulletStore} checkPlayerCollision={this.checkPlayerCollision} />
+                <Bullets store={bulletStore} checkPlayerCollision={this.checkPlayerCollision} />
                 {/*<Food store={this.root.foodStore} />*/}
             </>
         );

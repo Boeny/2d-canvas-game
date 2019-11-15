@@ -1,14 +1,13 @@
 import { observable, action } from "mobx";
-import { MenuMode } from "enums";
+import { Mode } from "enums";
 
 class MenuStore {
 
     @observable public visible = true;
-    @observable public mode: MenuMode = MenuMode.default;
+    @observable public mode: Mode = Mode.default;
 
-    @action public setMode(mode: MenuMode) {
+    @action public setMode(mode: Mode) {
         this.mode = mode;
-        this.visible = false;
     }
     @action public setVisibility(value: boolean) {
         this.visible = value;

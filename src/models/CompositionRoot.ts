@@ -1,12 +1,8 @@
-import { PlayerStore, EnemiesStore, BulletStore, FoodStore, EditorStore, ContainerStore } from "stores";
-import { ICollider, IBullet, INeuralNet, INeuralNetConfig } from "interfaces";
-import { VectorHelpers } from "helpers";
+import { PlayerStore, BulletStore, EditorStore } from "stores";
 import { Vector2 } from "./Vector2";
-import { NeuralNet } from "./NeuralNet";
 
 export class CompositionRoot {
 
-    public containerStore = new ContainerStore();
     public bulletStore = new BulletStore();
     public playerStore = new PlayerStore(
         new Vector2(),
@@ -17,12 +13,10 @@ export class CompositionRoot {
     // public foodStore = new FoodStore();
     public editorStore = new EditorStore();
 
-    public init() {
+    public init(width: number, height: number) {
 
-        const{ width, height } = this.containerStore;
-
-        this.containerStore.setSize(width, height);
         this.playerStore.setPositionAndDirection(new Vector2(width / 2, height / 2), Math.PI / 2);
+        this.playerStore.velocity = new Vector2();
 
         // this.enemiesStore = new EnemiesStore(
         //     this.getMaxDistanceToTheFood(),

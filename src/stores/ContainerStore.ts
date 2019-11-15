@@ -1,6 +1,6 @@
 import { observable, action } from "mobx";
 
-export class ContainerStore {
+class ContainerStore {
 
     @observable public width = 0;
     @observable public height = 0;
@@ -11,3 +11,5 @@ export class ContainerStore {
         this.height = height;
     }
 }
+
+export const containerStore = new ContainerStore();

@@ -17,7 +17,7 @@ export class PlayerStore {
     private ENERGY_FOR_MOVE = 10;
     private ENERGY_FOR_SHOT = 15;
 
-    private velocity = new Vector2();
+    public velocity = new Vector2();
     private timeToRecharge = 0;
     public actions: IActions = {
         up: false,
