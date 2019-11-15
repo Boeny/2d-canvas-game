@@ -1,7 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { CompositionRoot } from "models";
-import { MenuMode } from "enums/MenuMode";
+import { MenuMode } from "enums";
 import { menuStore } from "stores";
 import { WelcomeScene } from "./WelcomeScene";
 import { MainScene } from "./MainScene";

@@ -1,8 +1,7 @@
 import React from "react";
 import { Enemy } from "./Enemy";
-import { EnemiesStore } from "stores/EnemiesStore";
-import { ObjectWithHealth } from "components/ObjectWithHealth";
-import { PlayerStore } from "stores/PlayerStore";
+import { EnemiesStore, PlayerStore } from "stores";
+import { ObjectWithHealth } from "components";
 
 interface IProps {
     store: EnemiesStore;

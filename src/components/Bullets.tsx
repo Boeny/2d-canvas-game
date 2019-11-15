@@ -1,8 +1,8 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { BulletStore } from "stores/BulletStore";
+import { BulletStore } from "stores";
 import { IBullet } from "interfaces";
-import { GameObjectComponent } from "components/GameObjectComponent";
+import { GameObjectComponent } from "./GameObjectComponent";
 import { ScaledTriangle } from "./ScaledTriangle";
 
 interface IBulletProps {

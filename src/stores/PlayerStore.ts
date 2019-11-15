@@ -1,16 +1,7 @@
 import { observable, action, runInAction } from "mobx";
 import { Vector2 } from "models";
-import { VectorHelpers } from "helpers/VectorHelpers";
-import { IBaseBullet } from "interfaces";
-
-export interface IActions {
-    up: boolean;
-    down: boolean;
-    left: boolean;
-    right: boolean;
-    createBullet: boolean;
-    takeDamage: number;
-}
+import { VectorHelpers } from "helpers";
+import { IBaseBullet, IActions } from "interfaces";
 
 export class PlayerStore {
 

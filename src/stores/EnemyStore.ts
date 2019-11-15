@@ -1,6 +1,6 @@
-import { PlayerStore, IActions } from "./PlayerStore";
+import { PlayerStore } from "./PlayerStore";
 import { Vector2 } from "models";
-import { IBaseBullet, INeuralNet, INeuralNetConfig } from "interfaces";
+import { IBaseBullet, INeuralNet, INeuralNetConfig, IActions } from "interfaces";
 
 export class EnemyStore extends PlayerStore {
 

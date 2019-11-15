@@ -1,6 +1,6 @@
 import { PlayerStore, EnemiesStore, BulletStore, FoodStore, EditorStore, ContainerStore } from "stores";
 import { ICollider, IBullet, INeuralNet, INeuralNetConfig } from "interfaces";
-import { VectorHelpers } from "helpers/VectorHelpers";
+import { VectorHelpers } from "helpers";
 import { Vector2 } from "./Vector2";
 import { NeuralNet } from "./NeuralNet";
 

@@ -1,4 +1,3 @@
-import { isNullOrUndefined } from "util";
 
 export class Vector2 {
 
@@ -24,10 +23,10 @@ export class Vector2 {
 
     constructor(x?: number, y?: number) {
 
-        if (!isNullOrUndefined(x)) {
+        if (x !== undefined) {
             this.x = x;
         }
-        if (!isNullOrUndefined(y)) {
+        if (y !== undefined) {
             this.y = y;
         }
     }

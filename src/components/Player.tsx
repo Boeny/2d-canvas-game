@@ -1,8 +1,8 @@
 import React from "react";
-import { IActions } from "stores/PlayerStore";
-import { KeysType } from "enums/KeysType";
+import { IActions } from "interfaces";
+import { KeysType } from "enums";
 import { Vector2 } from "models";
-import { ActiveComponent } from "components/ActiveComponent";
+import { ActiveComponent } from "./ActiveComponent";
 import { ScaledTriangle } from "./ScaledTriangle";
 
 interface IProps {

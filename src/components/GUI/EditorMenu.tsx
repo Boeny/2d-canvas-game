@@ -25,7 +25,7 @@ export class EditorMenu extends React.PureComponent<IProps> {
     render() {
 
         if (menuStore.visible) {
-            return <noscript />;
+            return null;
         }
         return (
             <MenuComponent {...this.props} />

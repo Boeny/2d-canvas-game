@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { menuStore } from "stores";
+import { KeysType } from "enums";
 
 const root = document.getElementById("gui-root");
 
@@ -9,13 +11,14 @@ interface IProps {
 
 export class GUI extends React.PureComponent<IProps> {
 
-    element: HTMLDivElement | null = null;
+    private element: HTMLDivElement | null = null;
 
     componentDidMount() {
         if (!root) {
             return;
         }
         this.element = document.createElement("div");
+        this.element.addEventListener("keydown", this.onEscPressed);
         root.appendChild(this.element);
         this.renderPortal();
     }
@@ -28,13 +31,20 @@ export class GUI extends React.PureComponent<IProps> {
         if (!root || !this.element) {
             return;
         }
+        this.element.removeEventListener("keydown", this.onEscPressed);
         ReactDOM.unmountComponentAtNode(this.element); // unmount children content from element
         root.removeChild(this.element);
         this.element = null;
     }
 
-    renderPortal() {
+    private renderPortal() {
         ReactDOM.render(this.props.children, this.element); // mount children at element
+    }
+
+    onEscPressed = (e: KeyboardEvent) => {
+        if (e.keyCode === KeysType.esc) {
+            menuStore.setVisibility(!menuStore.visible);
+        }
     }
 
     render() {

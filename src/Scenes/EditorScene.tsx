@@ -1,8 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
-import { EditorStore, ContainerStore, menuStore } from "stores";
-import { Circle } from "components/Circle";
-import { GUI, Background, EditorMenu } from "components";
+import { EditorStore, ContainerStore } from "stores";
+import { Circle, GUI, Background, EditorMenu } from "components";
 
 interface IProps {
     containerStore: ContainerStore;

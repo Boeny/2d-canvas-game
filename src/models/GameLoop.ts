@@ -1,5 +1,5 @@
 import { runInAction } from "mobx";
-import { IGameObjectComponent } from "components/GameObjectComponent";
+import { IGameObjectComponent } from "interfaces";
 import { menuStore } from "stores";
 
 class GameLoop {

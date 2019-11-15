@@ -1,4 +1,4 @@
-import { IActiveComponent } from "components/ActiveComponent";
+import { IActiveComponent } from "interfaces";
 
 class ActiveObject {
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Vector2 } from "models";
-import { VectorHelpers } from "helpers/VectorHelpers";
+import { VectorHelpers } from "helpers";
 import { Triangle } from "./Triangle";
 
 interface IProps {

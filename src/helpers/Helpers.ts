@@ -1,4 +1,3 @@
-import { isNullOrUndefined } from "util";
 
 export abstract class Helpers {
 
@@ -26,14 +25,14 @@ export abstract class Helpers {
     }
 
     public static range(min: number, max?: number): number[] {
-        if (isNullOrUndefined(max) || min > max) {
+        if (max === undefined || min > max) {
             return Array.from({ length: min }).map((_, i) => i);
         }
         return Array.from({ length: max + 1 - min }).map((_, i) => i + min);
     }
 
     public static random(min: number, max?: number): number {
-        if (isNullOrUndefined(max) || min > max) {
+        if (max === undefined || min > max) {
             return Math.random() * min;
         }
         return Math.random() * (max - min) + min;

@@ -1,9 +1,6 @@
 import React from "react";
 import { gameLoop } from "models";
-
-export interface IGameObjectComponent {
-    onGameLoop: (delta: number) => void;
-}
+import { IGameObjectComponent } from "interfaces";
 
 export class GameObjectComponent<P> extends React.Component<P> implements IGameObjectComponent {
 

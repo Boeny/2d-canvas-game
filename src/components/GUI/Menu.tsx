@@ -1,7 +1,7 @@
 import "./Menu.scss";
 import React from "react";
 import { menuStore } from "stores";
-import { MenuMode } from "enums/MenuMode";
+import { MenuMode } from "enums";
 import { observer } from "mobx-react";
 
 function MenuComponent(props: IProps & { showContinue: boolean }) {
@@ -30,7 +30,7 @@ export class Menu extends React.PureComponent<IProps> {
     render() {
 
         if (!menuStore.visible) {
-            return <noscript />;
+            return null;
         }
         return (
             <MenuComponent

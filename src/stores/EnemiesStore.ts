@@ -16,7 +16,6 @@ export class EnemiesStore {
         createNeuralNet: (config: INeuralNetConfig) => INeuralNet
     ) {
         this.data = Helpers.range(this.COUNT).map(() => {
-
             return new EnemyStore(
                 maxDistanceToTheFood,
                 getRandomPosition(),

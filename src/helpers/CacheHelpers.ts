@@ -1,4 +1,3 @@
-import { isNullOrUndefined } from "util";
 
 export abstract class CacheHelpers {
 
@@ -23,7 +22,7 @@ export abstract class CacheHelpers {
         if (!window.localStorage) {
             return null;
         }
-        if (isNullOrUndefined(key)) { // remove all
+        if (key === undefined) { // remove all
             localStorage.clear();
         }
         else {
@@ -35,14 +34,14 @@ export abstract class CacheHelpers {
         this.setCache(key, JSON.stringify(data));
     }
 
-    public static getCachedObject<T>(key: string): T | null {
+    public static getCachedObject<T>(key: string): T | undefined {
 
         try {
             const obj = this.getCache(key);
-            return isNullOrUndefined(obj) ? null : JSON.parse(obj);
+            return obj ? JSON.parse(obj) : undefined;
         }
         catch (e) {
-            return null;
+            return undefined;
         }
     }
 }

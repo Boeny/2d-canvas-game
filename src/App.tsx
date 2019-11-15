@@ -3,7 +3,7 @@ import { Stage, Layer } from "react-konva";
 import { observer } from "mobx-react";
 import { menuStore } from "./stores";
 import { CompositionRoot, activeObject, gameLoop } from "./models";
-import { KeysType } from "./enums/KeysType";
+import { KeysType } from "./enums";
 import { Content } from "Content";
 
 @observer

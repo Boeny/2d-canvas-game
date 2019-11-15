@@ -1,5 +1,5 @@
 import { observable, action } from "mobx";
-import { MenuMode } from "enums/MenuMode";
+import { MenuMode } from "enums";
 
 class MenuStore {
 

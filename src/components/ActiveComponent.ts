@@ -1,13 +1,6 @@
 import { activeObject } from "models";
+import { IActiveComponent } from "interfaces";
 import { GameObjectComponent } from "./GameObjectComponent";
-
-export interface IActiveComponent {
-    onKeyDown: (e: KeyboardEvent) => void;
-    onKeyUp: (e: KeyboardEvent) => void;
-    onKeyPress: (e: KeyboardEvent) => void;
-    onContainerClick: (e: MouseEvent) => void;
-    onMouseMove: (e: MouseEvent) => void;
-}
 
 export class ActiveComponent<P> extends GameObjectComponent<P> implements IActiveComponent {
 
