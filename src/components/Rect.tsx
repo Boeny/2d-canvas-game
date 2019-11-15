@@ -7,19 +7,23 @@ interface IProps {
     height: number;
     position: Vector2;
     color: string;
-    onClick?: () => void;
+    onClick?: (mousePosition: Vector2) => void;
     onMouseMove?: (mousePosition: Vector2) => void;
 }
 
 export function Rect(props: IProps) {
+
+    const { color, position, onMouseMove, onClick, ...rest } = props;
+
     return (
         <KRect
-            {...props}
-            stroke={props.color}
-            fill={props.color}
-            x={props.position.x}
-            y={props.position.y}
-            onMouseMove={props.onMouseMove ? e => props.onMouseMove!(new Vector2(e.evt.clientX, e.evt.clientY)) : undefined}
+            {...rest}
+            stroke={color}
+            fill={color}
+            x={position.x}
+            y={position.y}
+            onClick={onClick ? e => onClick(new Vector2(e.evt.clientX, e.evt.clientY)) : undefined}
+            onMouseMove={onMouseMove ? e => onMouseMove(new Vector2(e.evt.clientX, e.evt.clientY)) : undefined}
         />
     );
 }

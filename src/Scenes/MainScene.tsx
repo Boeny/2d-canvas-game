@@ -2,7 +2,6 @@ import React from "react";
 import { Player, Bullets, ObjectWithHealth, Background } from "components";
 import { CompositionRoot } from "models";
 import { IBullet } from "interfaces";
-import { Mode } from "enums";
 
 interface IProps {
     root: CompositionRoot;

@@ -3,7 +3,13 @@ import React from "react";
 import { menuStore } from "stores";
 import { observer } from "mobx-react";
 
-function MenuComponent(props: IProps) {
+interface IProps {
+    placeStar: () => void;
+    placePlanet: () => void;
+    placeSatellite: () => void;
+}
+
+export function EditorMenu(props: IProps) {
     return (
         <div className="menu editorMenu">
             <button>Stars layer (place stars)</button>
@@ -11,24 +17,4 @@ function MenuComponent(props: IProps) {
             <button>Planet layer (place satellites)</button>
         </div>
     );
-}
-
-interface IProps {
-    placeStar: () => void;
-    placePlanet: () => void;
-    placeSatellite: () => void;
-}
-
-@observer
-export class EditorMenu extends React.PureComponent<IProps> {
-
-    render() {
-
-        if (menuStore.visible) {
-            return null;
-        }
-        return (
-            <MenuComponent {...this.props} />
-        );
-    }
 }

@@ -6,21 +6,20 @@ import { containerStore } from "stores";
 
 interface IProps {
     color: string;
+    onClick?: (mousePosition: Vector2) => void;
+    onMouseMove?: (mousePosition: Vector2) => void;
 }
 
 @observer
 export class Background extends React.PureComponent<IProps> {
 
     public render() {
-
-        const { color } = this.props;
-
         return (
             <Rect
                 position={new Vector2()}
                 width={containerStore.width}
                 height={containerStore.height}
-                color={color}
+                {...this.props}
             />
         );
     }

@@ -32,21 +32,23 @@ class MenuComponent extends React.PureComponent<IComponentProps> {
         const { mode, showContinue, onNew, onContinue, onEdit, onKeyDown } = this.props;
 
         return (
-            <div className="menu main" onKeyDown={onKeyDown}>
-                {
-                    showContinue
-                        ? (
-                            <button
-                                onClick={onContinue}
-                                ref={this.setActiveButton(mode === Mode.continue || mode === Mode.new)}
-                            >
-                                Continue
+            <div className="overlay" onKeyDown={onKeyDown}>
+                <div className="menu main">
+                    {
+                        showContinue
+                            ? (
+                                <button
+                                    onClick={onContinue}
+                                    ref={this.setActiveButton(mode === Mode.continue || mode === Mode.new)}
+                                >
+                                    Continue
                             </button>
-                        )
-                        : null
-                }
-                <button onClick={onNew}>New project</button>
-                <button onClick={onEdit} ref={this.setActiveButton(mode === Mode.edit)}>Editor</button>
+                            )
+                            : null
+                    }
+                    <button onClick={onNew}>New project</button>
+                    <button onClick={onEdit} ref={this.setActiveButton(mode === Mode.edit)}>Editor</button>
+                </div>
             </div>
         );
     }
