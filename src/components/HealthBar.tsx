@@ -1,7 +1,7 @@
 import React from "react";
-import { Rect } from "react-konva";
 import { Vector2 } from "models";
 import { Helpers } from "helpers";
+import { Rect } from "./figures";
 
 interface IProps {
     health: number;
@@ -20,11 +20,9 @@ export class HealthBar extends React.PureComponent<IProps> {
 
         return (
             <Rect
-                fill="red"
-                stroke="black"
-                strokeWidth={1}
-                x={position.x - width / 2}
-                y={window.innerHeight - position.y}
+                color="red"
+                borderColor="black"
+                position={new Vector2(position.x - width / 2, position.y)}
                 width={width}
                 height={3}
             />

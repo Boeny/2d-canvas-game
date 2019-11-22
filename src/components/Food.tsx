@@ -1,7 +1,7 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { ICollider } from "interfaces";
-import { Circle } from "./Circle";
+import { Circle } from "./figures";
 
 interface IProps {
     store: ICollider;

@@ -1,8 +1,11 @@
 import React from "react";
 import { observer } from "mobx-react";
 import { EditorStore } from "stores";
+import { ICircleProps } from "interfaces";
+import { Vector2, Planet } from "models";
 import { Circle, GUI, Background, EditorMenu } from "components";
-import { Vector2 } from "models";
+
+const PlanetComponent = observer((p: ICircleProps) => <Circle {...p} />);
 
 interface IProps {
     store: EditorStore;
@@ -11,28 +14,26 @@ interface IProps {
 @observer
 export class EditorScene extends React.PureComponent<IProps> {
 
+    planet: Planet | null = null;
+
     toggleDrawing = (position: Vector2) => {
-        const { store } = this.props;
-
-        if (store.drawRadiusForIndex === null) {
-            store.addPlanet(position, 0);
-            store.drawRadiusForIndex = store.planets.length - 1;
-
+        if (this.planet === null) {
+            this.planet = new Planet(position, 0);
+            this.props.store.addPlanet(this.planet);
         }
         else {
-            store.drawRadiusForIndex = null;
+            this.planet = null;
         }
-        console.log(store.drawRadiusForIndex, store.planets);
+        console.log(this.planet);
     }
 
     setRadius = (position: Vector2) => {
         const { store } = this.props;
 
-        if (store.drawRadiusForIndex === null) {
+        if (this.planet === null) {
             return;
         }
-        const center = store.planets[store.drawRadiusForIndex].position;
-        store.setRadius(store.drawRadiusForIndex, position.sub(center).length);
+        store.setRadius(this.planet, position.sub(this.planet.position).length);
     }
 
     render() {
@@ -54,7 +55,7 @@ export class EditorScene extends React.PureComponent<IProps> {
                     onMouseMove={this.setRadius}
                 />
                 {store.planets.map((p, i) =>
-                    <Circle key={i} {...p} color="white" />
+                    <PlanetComponent key={i} {...p} color="white" />
                 )}
             </>
         );

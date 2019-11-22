@@ -1,5 +1,7 @@
 import React from "react";
-import { Line } from "react-konva";
+import { observer } from "mobx-react";
+import { containerStore } from "stores";
+import { Line as KLine } from "react-konva";
 import { Vector2 } from "models";
 
 interface IProps {
@@ -9,6 +11,7 @@ interface IProps {
     color: string;
 }
 
+@observer
 export class Triangle extends React.PureComponent<IProps> {
 
     public render() {
@@ -16,11 +19,11 @@ export class Triangle extends React.PureComponent<IProps> {
         const { a, b, c, color } = this.props;
 
         return (
-            <Line
+            <KLine
                 points={[
-                    a.x, window.innerHeight - a.y,
-                    b.x, window.innerHeight - b.y,
-                    c.x, window.innerHeight - c.y
+                    a.x, containerStore.height - a.y,
+                    b.x, containerStore.height - b.y,
+                    c.x, containerStore.height - c.y
                 ]}
                 closed={true}
                 stroke={color}

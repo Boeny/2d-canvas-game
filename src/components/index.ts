@@ -5,4 +5,4 @@ export * from "./Enemies";
 export * from "./ObjectWithHealth";
 export * from "./Food";
 export * from "./GUI";
-export * from "./Circle";
+export * from "./figures";

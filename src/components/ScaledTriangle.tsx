@@ -1,7 +1,7 @@
 import React from "react";
 import { Vector2 } from "models";
 import { VectorHelpers } from "helpers";
-import { Triangle } from "./Triangle";
+import { Triangle } from "./figures";
 
 interface IProps {
     position: Vector2;

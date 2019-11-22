@@ -1,7 +1,5 @@
 import "./Menu.scss";
 import React from "react";
-import { menuStore } from "stores";
-import { observer } from "mobx-react";
 
 interface IProps {
     placeStar: () => void;

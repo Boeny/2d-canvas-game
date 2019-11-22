@@ -1,7 +1,7 @@
 import React from "react";
 import { Vector2 } from "models";
 import { Rect } from "./Rect";
-import { Line } from "react-konva";
+import { Line as KLine } from "react-konva";
 
 interface IProps {
     positions: Vector2[];
@@ -11,7 +11,7 @@ interface IProps {
 export function Bezier({ positions, setIndex }: IProps) {
     return (
         <>
-            <Line
+            <KLine
                 fill="black"
                 stroke="black"
                 bezier={true}
@@ -22,7 +22,7 @@ export function Bezier({ positions, setIndex }: IProps) {
                     positions[3].x, positions[3].y
                 ]}
             />
-            <Line
+            <KLine
                 fill="#ff5555"
                 stroke="#ff5555"
                 strokeWidth={1}

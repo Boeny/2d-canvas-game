@@ -6,9 +6,6 @@ export class ActiveComponent<P> extends GameObjectComponent<P> implements IActiv
 
     public onKeyDown = (e: KeyboardEvent) => {};
     public onKeyUp = (e: KeyboardEvent) => {};
-    public onKeyPress = (e: KeyboardEvent) => {};
-    public onContainerClick = (e: MouseEvent) => {};
-    public onMouseMove = (e: MouseEvent) => {};
 
     componentDidMount() {
         super.componentDidMount();

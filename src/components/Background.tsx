@@ -1,8 +1,8 @@
 import React from "react";
-import { Rect } from "./Rect";
-import { Vector2 } from "models";
 import { observer } from "mobx-react";
-import { containerStore } from "stores";
+import { containerStore, menuStore } from "stores";
+import { Rect } from "./figures";
+import { Vector2 } from "models";
 
 interface IProps {
     color: string;
@@ -14,12 +14,17 @@ interface IProps {
 export class Background extends React.PureComponent<IProps> {
 
     public render() {
+
+        const { color, onClick, onMouseMove } = this.props;
+
         return (
             <Rect
-                position={new Vector2()}
+                position={new Vector2(0, containerStore.height)}
                 width={containerStore.width}
                 height={containerStore.height}
-                {...this.props}
+                color={color}
+                onClick={menuStore.visible ? undefined : onClick}
+                onMouseMove={menuStore.visible ? undefined : onMouseMove}
             />
         );
     }

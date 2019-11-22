@@ -17,16 +17,7 @@ export class App extends React.PureComponent {
         if (!this.container) {
             return;
         }
-        this.container.addEventListener("click", e => {
-            e.preventDefault();
-            activeObject.instance && activeObject.instance.onContainerClick(e);
-        });
-        this.container.addEventListener("mousemove", e => {
-            e.preventDefault();
-            activeObject.instance && activeObject.instance.onMouseMove(e);
-        });
         this.container.addEventListener("keydown", e => {
-            e.preventDefault();
             activeObject.instance && activeObject.instance.onKeyDown(e);
 
             if (e.keyCode === KeysType.esc) {
@@ -34,7 +25,6 @@ export class App extends React.PureComponent {
             }
         });
         this.container.addEventListener("keyup", e => {
-            e.preventDefault();
             activeObject.instance && activeObject.instance.onKeyUp(e);
         });
         window.addEventListener("resize", this.reSize);
