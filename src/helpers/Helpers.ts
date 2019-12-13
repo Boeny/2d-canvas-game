@@ -45,4 +45,17 @@ export abstract class Helpers {
     public static getOppositeAngle(angle: number): number {
         return angle + Math.PI;
     }
+
+    public static throttle<T>(timeout: number, handler: (...args: T[]) => void): (...args: T[]) => void {
+        let lastCall: number | undefined;
+
+        return (...args) => {
+            const now = Date.now();
+
+            if (lastCall === undefined || now - lastCall > timeout) {
+                lastCall = now;
+                handler(...args);
+            }
+        };
+    }
 }

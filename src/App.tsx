@@ -2,7 +2,7 @@ import React from "react";
 import { Stage, Layer } from "react-konva";
 import { observer } from "mobx-react";
 import { menuStore, containerStore } from "./stores";
-import { CompositionRoot, activeObject, gameLoop } from "./models";
+import { CompositionRoot, activeObject, gameLoop, Vector2 } from "./models";
 import { KeysType } from "./enums";
 import { Scenes } from "scenes";
 import { Menu } from "components";
@@ -17,11 +17,17 @@ export class App extends React.PureComponent {
         if (!this.container) {
             return;
         }
+        this.container.addEventListener("mousedown", e => {
+            activeObject.instance && activeObject.instance.onMouseDown(new Vector2(e.clientX, containerStore.height - e.clientY), e.button);
+        });
+        this.container.addEventListener("mousemove", e => {
+            activeObject.instance && activeObject.instance.onMouseMove(new Vector2(e.clientX, containerStore.height - e.clientY));
+        });
         this.container.addEventListener("keydown", e => {
             activeObject.instance && activeObject.instance.onKeyDown(e);
 
             if (e.keyCode === KeysType.esc) {
-                this.onEscapePressed();
+                this.onEscPressed();
             }
         });
         this.container.addEventListener("keyup", e => {
@@ -41,7 +47,7 @@ export class App extends React.PureComponent {
         containerStore.setSize(window.innerWidth, window.innerHeight);
     }
 
-    private onEscapePressed() {
+    private onEscPressed() {
         menuStore.setVisibility(true);
     }
 
